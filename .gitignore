@@ -1,0 +1,10 @@
+*.ez
+/.fetch
+/_build/
+/cover/
+/deps/
+/doc/
+/priv/plts/
+/tmp/
+erl_crash.dump
+pages-*.tar
