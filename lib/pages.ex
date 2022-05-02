@@ -1,4 +1,6 @@
 defmodule Pages do
+  # @related [test](test/pages_test.exs)
+
   @moduledoc """
   Entry point for interacting with pages.
 

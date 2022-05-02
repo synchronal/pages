@@ -1,4 +1,7 @@
 defmodule Pages.Driver do
+  # @related [conn driver](lib/pages/driver/conn.ex)
+  # @related [live view driver](lib/pages/driver/live_view.ex)
+
   @moduledoc """
   Defines types and behaviours that page drivers must implement.
   """

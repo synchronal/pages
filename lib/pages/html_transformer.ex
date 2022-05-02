@@ -1,4 +1,6 @@
 defmodule Pages.HtmlTransformer do
+  # @related [test](/test/pages/html_transformer_test.exs)
+
   @moduledoc "Functions that transform Floki HTML"
 
   @spec filter_by_text(Floki.html_tree(), function()) :: list()
