@@ -3,46 +3,8 @@ defmodule Pages.HtmlTest do
 
   use Test.SimpleCase, async: true
 
-  doctest Pages.Html
-
-  describe "attr" do
-    test "returns the values of the given attribute" do
-      html = """
-      <div class="baz" id="foo">foo</div>
-      <div class="baz" id="bar">bar</div>
-      """
-
-      html |> Pages.Html.attr("id", :all, :*) |> assert_eq(["foo", "bar"])
-      html |> Pages.Html.attr("class", :all, :*) |> assert_eq(["baz", "baz"])
-    end
-
-    test "only gets attrs from elements that match the query (and specifically, not their children)" do
-      """
-      <div class="exclude" id="div1">
-        <p class="include" id="p1">
-          <span class="exclude" id="span1"></span>
-        </p>
-      </div>
-      """
-      |> Pages.Html.attr("id", :all, class: "include")
-      |> assert_eq(["p1"])
-    end
-  end
-
-  describe "data" do
-    test "returns the values of the data attributes" do
-      html = """
-      <div data-foo="foo1" data-bar="bar1">1</div>
-      <div data-foo="foo2" data-bar="bar2">2</div>
-      """
-
-      html |> Pages.Html.data("foo", :all, :*) |> assert_eq(["foo1", "foo2"])
-      html |> Pages.Html.data("foo", :first, :*) |> assert_eq("foo1")
-    end
-  end
-
-  describe "find" do
-    test "with :all, finds all matching elements" do
+  describe "all" do
+    test "finds all matching elements, and returns them as a list of HTML trees" do
       html = """
       <div>
         <p>P1</p>
@@ -52,7 +14,7 @@ defmodule Pages.HtmlTest do
       """
 
       html
-      |> Pages.Html.find(:all, "p")
+      |> Pages.Html.all("p")
       |> assert_eq([
         {"p", [], ["P1"]},
         {"p", [], ["P2", {"p", [], ["P2 A"]}, {"p", [], ["P2 B"]}]},
@@ -61,35 +23,12 @@ defmodule Pages.HtmlTest do
         {"p", [], ["P3"]}
       ])
 
-      html |> Pages.Html.find(:all, "glorp") |> assert_eq([])
+      html
+      |> Pages.Html.all("glorp")
+      |> assert_eq([])
     end
 
-    test "with :first, finds first matching element" do
-      html = """
-      <div>
-        <p>P1</p>
-        <p>P2</p>
-        <p>P3</p>
-      </div>
-      """
-
-      html |> Pages.Html.find(:first, "p") |> assert_eq({"p", [], ["P1"]})
-      html |> Pages.Html.find(:first, "glorp") |> assert_eq(nil)
-    end
-
-    test "with :first!, finds first matching element and fails if there are 0 or more than 1" do
-      html = """
-      <p>P1</p>
-      <p>P2</p>
-      <div>DIV</div>
-      """
-
-      html |> Pages.Html.find(:first!, "div") |> assert_eq({"div", [], ["DIV"]})
-      assert_raise RuntimeError, fn -> html |> Pages.Html.find(:first!, "glorp") end
-      assert_raise RuntimeError, fn -> html |> Pages.Html.find(:first!, "p") end
-    end
-
-    test "query can be a string or a keyword list" do
+    test "accepts queries as strings or keyword lists" do
       html = """
       <div>
         <p id="p1" class="para">P1</p>
@@ -98,25 +37,128 @@ defmodule Pages.HtmlTest do
       """
 
       html
-      |> Pages.Html.find(:all, "[id=p2][class=para]")
+      |> Pages.Html.all("#p2.para")
       |> assert_eq([{"p", [{"id", "p2"}, {"class", "para"}], ["P2"]}])
 
       html
-      |> Pages.Html.find(:all, id: "p2", class: "para")
+      |> Pages.Html.all("[id=p2][class=para]")
+      |> assert_eq([{"p", [{"id", "p2"}, {"class", "para"}], ["P2"]}])
+
+      html
+      |> Pages.Html.all(id: "p2", class: "para")
       |> assert_eq([{"p", [{"id", "p2"}, {"class", "para"}], ["P2"]}])
     end
+  end
 
-    test "takes a transformer function" do
+  describe "find" do
+    test "finds the first matching element, and returns it as an HTML node" do
       html = """
       <div>
-        <p>hello</p>
-        <p>bob</p>
+        <p>P1</p>
+        <p>P2</p>
+        <p>P3</p>
       </div>
       """
 
-      html
-      |> Pages.Html.find(:all, :p, &Enum.map(&1, fn {"p", [], [text]} -> String.upcase(text) end))
-      |> assert_eq(["HELLO", "BOB"])
+      html |> Pages.Html.find("p") |> assert_eq({"p", [], ["P1"]})
+      html |> Pages.Html.find("glorp") |> assert_eq(nil)
+    end
+  end
+
+  describe "find!" do
+    test "finds first matching element, returning it as an HTML node, and fails if there are 0 or more than 1" do
+      html = """
+      <p>P1</p>
+      <p>P2</p>
+      <div>DIV</div>
+      """
+
+      html |> Pages.Html.find!("div") |> assert_eq({"div", [], ["DIV"]})
+      assert_raise RuntimeError, fn -> html |> Pages.Html.find!("glorp") end
+      assert_raise RuntimeError, fn -> html |> Pages.Html.find!("p") end
+    end
+  end
+
+  describe "attr" do
+    @html """
+    <div class="profile-list" id="profiles">
+      <div class="profile admin" id="alice">
+        <div class="name">Alice</div>
+      </div>
+      <div class="profile" id="billy">
+        <div class="name">Billy</div>
+      </div>
+    </div>
+    """
+
+    test "returns the value of an attr from the outermost element of an HTML node" do
+      @html |> Pages.Html.find("#alice") |> Pages.Html.attr("class") |> assert_eq("profile admin")
+    end
+
+    test "returns nil if the attr does not exist" do
+      @html |> Pages.Html.find("#alice") |> Pages.Html.attr("foo") |> assert_eq(nil)
+    end
+
+    test "raises if the first argument is a list or HTML tree" do
+      assert_raise RuntimeError,
+                   """
+                   Expected a single HTML node but got:
+
+                   <div class="profile admin" id="alice">
+                     <div class="name">
+                       Alice
+                     </div>
+                   </div>
+                   <div class="profile" id="billy">
+                     <div class="name">
+                       Billy
+                     </div>
+                   </div>
+
+                   Consider using Enum.map(html, &Pages.Html.attr(&1, "id"))
+                   """,
+                   fn -> @html |> Pages.Html.all(".profile") |> Pages.Html.attr("id") end
+    end
+  end
+
+  describe "text" do
+    @html """
+    <div>
+      <p>P1</p>
+      <p>P2 <span>a span</span></p>
+      <p>P3</p>
+    </div>
+    """
+
+    test "returns the text value of the HTML node" do
+      @html |> Pages.Html.find("div") |> Pages.Html.text() |> assert_eq("P1 P2  a span P3")
+    end
+
+    test "requires the use of `Enum.map` to get a list" do
+      @html |> Pages.Html.all("p") |> Enum.map(&Pages.Html.text/1) |> assert_eq(["P1", "P2  a span", "P3"])
+    end
+
+    test "raises if a list or HTML tree is passed in" do
+      assert_raise RuntimeError,
+                   """
+                   Expected a single HTML node but got:
+
+                   <p>
+                     P1
+                   </p>
+                   <p>
+                     P2
+                     <span>
+                       a span
+                     </span>
+                   </p>
+                   <p>
+                     P3
+                   </p>
+
+                   Consider using Enum.map(html, &Pages.Html.text/1)
+                   """,
+                   fn -> @html |> Pages.Html.all("p") |> Pages.Html.text() end
     end
   end
 
@@ -180,7 +222,7 @@ defmodule Pages.HtmlTest do
     end
 
     test "when given a threeple, assumes it is a floki element" do
-      {"div", [], ["hi"]} |> Pages.Html.parse() |> assert_eq({"div", [], ["hi"]})
+      {"div", [], ["hi"]} |> Pages.Html.parse() |> assert_eq([{"div", [], ["hi"]}])
     end
 
     test "can parse any struct that implements String.Chars" do
@@ -225,33 +267,6 @@ defmodule Pages.HtmlTest do
         </span>
       </div>
       """)
-    end
-  end
-
-  describe "text" do
-    test "extracts text" do
-      """
-      <p>Text of the first paragraph</p>
-      <span>Here is a span</span>
-      <p>Text of the second paragraph, <span>with an embedded span</span></p>
-      """
-      |> Pages.Html.text(:all, "p")
-      |> assert_eq([
-        "Text of the first paragraph",
-        "Text of the second paragraph,  with an embedded span"
-      ])
-    end
-  end
-
-  describe "tids" do
-    test "finds tids" do
-      """
-      <p class="active" tid="alice">Alice</p>
-      <p class="inactive" tid="billy">Billy</p>
-      <p class="active" tid="cindy">Cindy</p>
-      """
-      |> Pages.Html.tid(:all, "p[class=active]")
-      |> assert_eq(~w[alice cindy])
     end
   end
 end

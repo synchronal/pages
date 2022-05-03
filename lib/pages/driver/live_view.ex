@@ -99,7 +99,7 @@ defmodule Pages.Driver.LiveView do
   end
 
   defp maybe_trigger_action(%__MODULE__{} = page, params) do
-    case page |> Pages.Html.find(:first, "[phx-trigger-action]") do
+    case page |> Pages.Html.find("[phx-trigger-action]") do
       element when not is_nil(element) ->
         page.live
         |> Phoenix.LiveViewTest.form("form[phx-trigger-action]", params)
