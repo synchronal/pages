@@ -20,7 +20,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.13.4"
-          otp-version: "24.3.3"
+          otp-version: "24.3.4"
       - name: Cache deps
         uses: actions/cache@v2
         with:
@@ -49,7 +49,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.13.4"
-          otp-version: "24.3.3"
+          otp-version: "24.3.4"
       - name: Cache deps
         uses: actions/cache@v2
         with:
@@ -61,7 +61,7 @@ jobs:
           path: _build
           key: ${{ runner.os }}-build-v1-${{ hashFiles('**/mix.lock', '.tool-versions') }}
       - name: Run tests
-        run: mix test --color
+        run: mix test --color --warnings-as-errors
         working-directory: .
       - name: Run mix audit
         run: MIX_ENV=dev mix deps.audit
@@ -81,7 +81,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.13.4"
-          otp-version: "24.3.3"
+          otp-version: "24.3.4"
       - name: Cache deps
         uses: actions/cache@v2
         with:
@@ -119,7 +119,7 @@ jobs:
         uses: erlef/setup-beam@v1
         with:
           elixir-version: "1.13.4"
-          otp-version: "24.3.3"
+          otp-version: "24.3.4"
       - name: Cache deps
         uses: actions/cache@v2
         with:
