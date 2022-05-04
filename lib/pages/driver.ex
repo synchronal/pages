@@ -7,8 +7,8 @@ defmodule Pages.Driver do
   """
 
   @type t() ::
-          %Pages.Driver.Conn{}
-          | %Pages.Driver.LiveView{}
+          Pages.Driver.Conn.t()
+          | Pages.Driver.LiveView.t()
 
   @doc "Click an element within a page."
   @callback click(Pages.Driver.t(), binary(), Pages.Css.selector()) ::
