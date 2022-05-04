@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/synchronal/pages/actions/workflows/tests.yml/badge.svg)](https://github.com/synchronal/pages/actions)
 [![Hex pm](http://img.shields.io/hexpm/v/pages.svg?style=flat)](https://hex.pm/packages/pages)
+[![License](http://img.shields.io/github/license/synchronal/pages.svg?style=flat)](https://github.com/synchronal/pages/blob/main/LICENSE.md)
 
 A Page Object pattern for interacting with websites. This library can be used to
 facilitate testing of Phoenix controllers and LiveView pages in the context of ExUnit,
