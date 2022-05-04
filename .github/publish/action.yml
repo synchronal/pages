@@ -1,4 +1,5 @@
 name: "Publish to Hex"
+description: "Publish an existing package to hex.pm when the version changes."
 inputs:
   key:
     description: "Write key"
@@ -12,6 +13,7 @@ inputs:
   working-directory:
     description: "Working directory to Mix project"
     default: "."
+    required: false
 outputs:
   local-version:
     description: "Version from project"

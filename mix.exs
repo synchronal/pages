@@ -2,6 +2,7 @@ defmodule Pages.MixProject do
   use Mix.Project
 
   @scm_url "https://github.com/synchronal/pages"
+  @version "0.1.0"
 
   def application do
     [
@@ -24,7 +25,7 @@ defmodule Pages.MixProject do
       preferred_cli_env: [credo: :test, dialyzer: :test],
       source_url: @scm_url,
       start_permanent: Mix.env() == :prod,
-      version: "0.1.0"
+      version: @version
     ]
   end
 
