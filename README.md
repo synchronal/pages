@@ -12,6 +12,8 @@ and may be used as the basis of other drivers.
 breaking changes. While new, this library is undergoing rapid development. A goal is
 to reach a stable API and a `1.0.0` release as soon as possible.
 
+See the [API reference](api-reference.html) for more info.
+
 ## Installation
 
 ```elixir
@@ -22,4 +24,7 @@ def deps do
 end
 ```
 
+## Usage
+
+_coming soon_
 

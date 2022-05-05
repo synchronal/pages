@@ -1,35 +1,86 @@
 defmodule Pages.Css do
   # @related [test](/test/pages/css_test.exs)
 
-  @moduledoc "Constructs CSS selectors via Elixir data structures."
+  @moduledoc """
+  Constructs CSS selectors via Elixir data structures. See `query/1` for details.
+  """
 
   @type selector() :: binary() | atom() | list()
 
   @doc ~S"""
-  When given a string, returns the string. Otherwise, accepts a keyword list and converts it into a string.
+  Accepts a string, atom, or list and returns a CSS string.
 
-  ## Examples
+  ## String syntax
 
-     iex> Pages.Css.query(test_role: "wheat", class: "math")
-     "[test-role='wheat'][class='math']"
+  When given a string, returns the string. This is useful when you don't know if a selector is already a string.
 
-     iex> Pages.Css.query(p: [test_role: "wheat", class: "math"])
-     "p[test-role='wheat'][class='math']"
+  ```elixir
+  iex> Pages.Css.query(".profile[test-role='new-members']")
+  ".profile[test-role='new-members']"
+  ```
 
-     iex> Pages.Css.query([[p: [id: "blue", data_favorite: true]], :div, [class: "class", test_role: "role"]])
-     "p[id='blue'][data-favorite] div [class='class'][test-role='role']"
+  ## Keyword list syntax
 
+  _The keyword list syntax is intentionally limited; complex selectors are more
+  easily written as strings._
+
+  The keyword list syntax makes it a bit eaiser to write simple selectors or selectors that use variables:
+  e.g.:
+
+  ```elixir
+  Pages.Css.query(test_role: "new-members")
+  Pages.Css.query(id: some_variable)
+  ```
+
+  Keys are expected to be atoms and will be dasherized (`foo_bar` -> `foo-bar`).
+  Values are expected to be strings or another keyword list.
+
+  A key/value pair will be converted to an attribute selector:
+  ```elixir
+  iex> Pages.Css.query(test_role: "new-members")
+  "[test-role='new-members']"
+  ```
+
+  A keyword list will be converted to a list of attribute selectors:
+
+  ```elixir
+  iex> Pages.Css.query(class: "profile", test_role: "new-members")
+  "[class='profile'][test-role='new-members']"
+  ```
+
+  (Note that the CSS selector `.profile` expands to `[class~='profile']` which is not equivalent to
+  `[class='profile']`. The keyword list syntax will not generate `~=` selectors so you should use a
+  string selector such as `".profile[test-role='new-members']"` instead if you want `~=` semantics. See the
+  [CSS spec](https://www.w3.org/TR/CSS21/selector.html#attribute-selectors) for details.)
+
+  When the value is a keyword list, the key is converted to an element selector:
+
+  ```elixir
+  iex> Pages.Css.query(p: [class: "profile", test_role: "new-members"])
+  "p[class='profile'][test-role='new-members']"
+  ```
+
+  ## Regular (non-keyword) list syntax
+
+  _The list syntax is intentionally limited; complex selectors are more
+  easily written as strings._
+
+  When the value is a regular (non-keyword) list, atoms are converted to element selectors and
+  keyword lists are converted as described above.
+
+  ```elixir
+  iex> Pages.Css.query([[p: [class: "profile", test_role: "new-members"]], :div, [class: "tag"]])
+  "p[class='profile'][test-role='new-members'] div [class='tag']"
+  ```
   """
-  def query(binary) when is_binary(binary), do: binary
-  def query(atom) when is_atom(atom), do: atom |> to_string() |> query()
-  def query(list) when is_list(list), do: reduce(list) |> Euclid.String.squish()
+  @spec query(selector()) :: binary()
+  def query(selector) when is_binary(selector), do: selector
+  def query(selector) when is_atom(selector), do: selector |> to_string() |> query()
+  def query(selector) when is_list(selector), do: reduce(selector) |> Euclid.String.squish()
 
   defp reduce(input, result \\ "")
   defp reduce([head | tail], result), do: result <> reduce(head) <> reduce(tail)
-
-  defp reduce({k, v}, result) when is_atom(k),
-    do: reduce({k |> to_string() |> Euclid.String.dasherize(), v}, result)
-
+  defp reduce({k, v}, result) when is_atom(k), do: reduce({k |> to_string() |> Euclid.String.dasherize(), v}, result)
   defp reduce({k, v}, result) when is_list(v), do: "#{result} #{k}#{reduce(v)}"
   defp reduce({_k, false}, result), do: result
   defp reduce({k, true}, result), do: "#{result}[#{k}]"

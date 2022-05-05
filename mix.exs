@@ -56,7 +56,7 @@ defmodule Pages.MixProject do
 
   defp docs do
     [
-      main: "Pages",
+      main: "readme",
       extras: ["README.md", "LICENSE.md"],
       groups_for_modules: [
         Drivers: [Pages.Driver, Pages.Driver.Conn, Pages.Driver.LiveView]

@@ -6,7 +6,7 @@ defmodule Pages do
 
   Pages are built around `t:Pages.Driver.t/0` structs. Drivers hold state about
   the current connection, implement `@behavior Pages.Driver` and must implement
-  the`String.Chars` protocol to transform themselves into HTML.
+  the `String.Chars` protocol to transform themselves into HTML.
 
   ## Available drivers
 
@@ -19,12 +19,12 @@ defmodule Pages do
   @type page_type_t() :: :live_view
   @type html_t() :: Floki.html_tree()
 
-  @doc "Instantiate a new page."
+  @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()
   def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-
   def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
+  @doc "Simulates clicking on an element at `selector` with title `title`."
   @spec click(Pages.Driver.t(), binary(), Pages.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, title, selector), do: module.click(page, title, selector)
 
@@ -32,16 +32,15 @@ defmodule Pages do
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
   def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
 
-  @doc "Fills in a form with the attributes and submits it."
+  @doc "Fills in a form with `attributes` and submits it."
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
-  def submit_form(%module{} = page, selector, schema, attrs),
-    do: module.submit_form(page, selector, schema, attrs)
+  def submit_form(%module{} = page, selector, schema, attrs), do: module.submit_form(page, selector, schema, attrs)
 
-  @doc "Fills in a form with the attributes without submitting it."
+  @doc "Fills in a form with `attributes` without submitting it."
   @spec update_form(Pages.Driver.t(), Pages.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
-  def update_form(%module{} = page, selector, schema, attrs),
-    do: module.update_form(page, selector, schema, attrs)
+  def update_form(%module{} = page, selector, schema, attrs), do: module.update_form(page, selector, schema, attrs)
 
+  @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()
   def visit(%module{} = page, path), do: module.visit(page, path)
 end
