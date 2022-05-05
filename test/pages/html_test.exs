@@ -28,6 +28,10 @@ defmodule Pages.HtmlTest do
       |> assert_eq([])
     end
 
+    test "returns empty list when nothing is found" do
+      assert Pages.Html.all("<div><p>hi</p></div>", "img") == []
+    end
+
     test "accepts queries as strings or keyword lists" do
       html = """
       <div>
@@ -66,16 +70,37 @@ defmodule Pages.HtmlTest do
   end
 
   describe "find!" do
-    test "finds first matching element, returning it as an HTML node, and fails if there are 0 or more than 1" do
-      html = """
-      <p>P1</p>
-      <p>P2</p>
-      <div>DIV</div>
-      """
+    @html """
+    <p>P1</p>
+    <p>P2</p>
+    <div>DIV</div>
+    """
 
-      html |> Pages.Html.find!("div") |> assert_eq({"div", [], ["DIV"]})
-      assert_raise RuntimeError, fn -> html |> Pages.Html.find!("glorp") end
-      assert_raise RuntimeError, fn -> html |> Pages.Html.find!("p") end
+    test "finds first matching element and returns it as an HTML node" do
+      @html |> Pages.Html.find!("div") |> assert_eq({"div", [], ["DIV"]})
+    end
+
+    test "fails if no element is found" do
+      assert_raise RuntimeError,
+                   "Expected a single HTML node but found none",
+                   fn -> @html |> Pages.Html.find!("glorp") end
+    end
+
+    test "fails if more than 1 element is found" do
+      assert_raise RuntimeError,
+                   """
+                   Expected a single HTML node but got:
+
+                   <p>
+                     P1
+                   </p>
+                   <p>
+                     P2
+                   </p>
+
+
+                   """,
+                   fn -> @html |> Pages.Html.find!("p") end
     end
   end
 

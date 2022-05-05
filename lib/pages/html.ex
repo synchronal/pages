@@ -182,6 +182,8 @@ defmodule Pages.Html do
 
   defp first!(html, hint \\ nil)
 
+  defp first!([], _hint), do: raise("Expected a single HTML node but found none")
+
   defp first!([node], _hint), do: node
 
   defp first!(html, hint) do
