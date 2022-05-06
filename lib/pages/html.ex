@@ -192,6 +192,7 @@ defmodule Pages.Html do
   false
   iex> Pages.Html.normalize(a) == Pages.Html.normalize(b)
   true
+  ```
   """
   @spec normalize(html()) :: binary()
   def normalize(html), do: html |> parse() |> Floki.raw_html()

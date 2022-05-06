@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
-set -exo pipefail
+set -eo pipefail
 
+mix docs 2>&1 | grep 'warning:' && exit 1
+
+set -x
 mix credo --strict
 mix dialyzer
 mix deps.audit
