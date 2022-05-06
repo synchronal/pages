@@ -3,6 +3,8 @@ defmodule Pages.HtmlTest do
 
   use Test.SimpleCase, async: true
 
+  doctest Pages.Html
+
   describe "all" do
     test "finds all matching elements, and returns them as a list of HTML trees" do
       html = """
