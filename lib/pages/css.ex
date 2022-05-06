@@ -2,7 +2,7 @@ defmodule Pages.Css do
   # @related [test](/test/pages/css_test.exs)
 
   @moduledoc """
-  Constructs CSS selectors via Elixir data structures. See `query/1` for details.
+  Constructs CSS selectors via Elixir data structures. See `selector/1` for details.
   """
 
   @type selector() :: binary() | atom() | list()
@@ -15,7 +15,7 @@ defmodule Pages.Css do
   When given a string, returns the string. This is useful when you don't know if a selector is already a string.
 
   ```elixir
-  iex> Pages.Css.query(".profile[test-role='new-members']")
+  iex> Pages.Css.selector(".profile[test-role='new-members']")
   ".profile[test-role='new-members']"
   ```
 
@@ -28,8 +28,8 @@ defmodule Pages.Css do
   e.g.:
 
   ```elixir
-  Pages.Css.query(test_role: "new-members")
-  Pages.Css.query(id: some_variable)
+  Pages.Css.selector(test_role: "new-members")
+  Pages.Css.selector(id: some_variable)
   ```
 
   Keys are expected to be atoms and will be dasherized (`foo_bar` -> `foo-bar`).
@@ -37,14 +37,14 @@ defmodule Pages.Css do
 
   A key/value pair will be converted to an attribute selector:
   ```elixir
-  iex> Pages.Css.query(test_role: "new-members")
+  iex> Pages.Css.selector(test_role: "new-members")
   "[test-role='new-members']"
   ```
 
   A keyword list will be converted to a list of attribute selectors:
 
   ```elixir
-  iex> Pages.Css.query(class: "profile", test_role: "new-members")
+  iex> Pages.Css.selector(class: "profile", test_role: "new-members")
   "[class='profile'][test-role='new-members']"
   ```
 
@@ -56,7 +56,7 @@ defmodule Pages.Css do
   When the value is a keyword list, the key is converted to an element selector:
 
   ```elixir
-  iex> Pages.Css.query(p: [class: "profile", test_role: "new-members"])
+  iex> Pages.Css.selector(p: [class: "profile", test_role: "new-members"])
   "p[class='profile'][test-role='new-members']"
   ```
 
@@ -69,14 +69,18 @@ defmodule Pages.Css do
   keyword lists are converted as described above.
 
   ```elixir
-  iex> Pages.Css.query([[p: [class: "profile", test_role: "new-members"]], :div, [class: "tag"]])
+  iex> Pages.Css.selector([[p: [class: "profile", test_role: "new-members"]], :div, [class: "tag"]])
   "p[class='profile'][test-role='new-members'] div [class='tag']"
   ```
   """
+  @spec selector(selector()) :: binary()
+  def selector(input) when is_binary(input), do: input
+  def selector(input) when is_atom(input), do: input |> to_string() |> selector()
+  def selector(input) when is_list(input), do: reduce(input) |> Euclid.String.squish()
+
+  @deprecated "Use `selector/1` instead"
   @spec query(selector()) :: binary()
-  def query(selector) when is_binary(selector), do: selector
-  def query(selector) when is_atom(selector), do: selector |> to_string() |> query()
-  def query(selector) when is_list(selector), do: reduce(selector) |> Euclid.String.squish()
+  def query(input), do: selector(input)
 
   defp reduce(input, result \\ "")
   defp reduce([head | tail], result), do: result <> reduce(head) <> reduce(tail)

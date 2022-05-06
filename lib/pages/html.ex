@@ -56,7 +56,7 @@ defmodule Pages.Html do
 
   @spec all(html(), selector()) :: Floki.html_tree()
   @doc "Finds all elements in `html` that match `selector`."
-  def all(html, selector), do: html |> parse() |> Floki.find(Pages.Css.query(selector))
+  def all(html, selector), do: html |> parse() |> Floki.find(Pages.Css.selector(selector))
 
   @spec find(html(), selector()) :: Floki.html_node()
   @doc "Finds the first element in `html` that matches `selector`"
@@ -102,14 +102,14 @@ defmodule Pages.Html do
 
   defp input_values(acc, html, selector) do
     html
-    |> all(Pages.Css.query(selector) <> " input[type=text]")
+    |> all(Pages.Css.selector(selector) <> " input[type=text]")
     |> attrs_to_map("name", "value", &unwrap_input_name/1)
     |> Map.merge(acc, fn _k, a, b -> List.flatten([a, b]) end)
   end
 
   defp textarea_values(acc, html, selector) do
     html
-    |> all(Pages.Css.query(selector) <> " textarea")
+    |> all(Pages.Css.selector(selector) <> " textarea")
     |> attrs_to_map("name", :text, &unwrap_input_name/1)
     |> Map.merge(acc, fn _k, a, b -> List.flatten([a, b]) end)
   end

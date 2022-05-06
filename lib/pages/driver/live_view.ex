@@ -31,7 +31,7 @@ defmodule Pages.Driver.LiveView do
   @spec click(Pages.Driver.t(), binary(), Pages.Css.selector()) :: Pages.Driver.t()
   def click(%__MODULE__{} = page, title, selector) do
     page.live
-    |> element(Pages.Css.query(selector), title)
+    |> element(Pages.Css.selector(selector), title)
     |> render_click()
     |> handle_rendered_result(page)
   end
@@ -39,7 +39,7 @@ defmodule Pages.Driver.LiveView do
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
-    |> form(Pages.Css.query(selector))
+    |> form(Pages.Css.selector(selector))
     |> render_submit()
     |> handle_rendered_result(page)
   end
@@ -50,7 +50,7 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Pages.Css.query(selector), params)
+    |> form(Pages.Css.selector(selector), params)
     |> render_submit()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
@@ -62,7 +62,7 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Pages.Css.query(selector), params)
+    |> form(Pages.Css.selector(selector), params)
     |> render_change()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
