@@ -40,7 +40,7 @@ defmodule Pages.MixProject do
       {:gestalt, "~> 1.0"},
       {:jason, "~> 1.3", optional: true},
       {:mix_audit, "~> 1.0", only: :dev, runtime: false},
-      {:moar, "~> 0.1", github: "synchronal/moar", ref: "bd7d61144eb3cb759308fde0e8190c573a6b81ed"},
+      {:moar, "~> 0.1"},
       {:phoenix, "~> 1.6"},
       {:phoenix_live_view, "~> 0.17.9"}
     ]
