@@ -2,6 +2,10 @@
 
 ## Unrelease changes
 
+## 0.2.1
+
+- Replace `Euclid` dependency with `Moar`
+
 ## 0.2.0
 
 - **Breaking change:** remove `scope` parameter in `Pages.Html`. Disambiguate `Pages.Html.find`
