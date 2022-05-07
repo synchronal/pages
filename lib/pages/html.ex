@@ -113,7 +113,7 @@ defmodule Pages.Html do
     html
     |> parse()
     |> first!("Consider using Enum.map(html, &#{@module_name}.attr(&1, #{inspect(attr)}))")
-    |> Floki.attribute(Euclid.Atom.to_string(attr))
+    |> Floki.attribute(Moar.Atom.to_string(attr))
     |> List.first()
   end
 
@@ -151,7 +151,7 @@ defmodule Pages.Html do
     %{}
     |> input_values(html, selector)
     |> textarea_values(html, selector)
-    |> Euclid.Map.atomize_keys()
+    |> Moar.Map.atomize_keys()
   end
 
   @doc """
@@ -207,7 +207,7 @@ defmodule Pages.Html do
   def parse(html_string) when is_binary(html_string), do: html_string |> Floki.parse_fragment!()
   def parse(html_tree) when is_list(html_tree), do: html_tree
   def parse({element, attrs, contents}), do: [{element, attrs, contents}]
-  def parse(%_{} = struct), do: struct |> implements_protocol!(String.Chars) |> to_string() |> parse()
+  def parse(%_{} = struct), do: struct |> Moar.Protocol.implements!(String.Chars) |> to_string() |> parse()
 
   @doc """
   Parses an HTML document using `Floki.parse_document!/1`, returning a
@@ -263,15 +263,6 @@ defmodule Pages.Html do
       [_, unwrapped] when not is_nil(unwrapped) -> unwrapped
       _ -> input_name
     end
-  end
-
-  # # #
-
-  # switch to Euclid following merge: https://github.com/geometerio/euclid/pull/6
-  defp implements_protocol!(x, protocol) do
-    if protocol.impl_for(x) == nil,
-      do: raise("Expected #{inspect(x)} to implement protocol #{inspect(protocol)}"),
-      else: x
   end
 
   # # #

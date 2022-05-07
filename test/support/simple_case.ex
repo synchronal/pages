@@ -7,7 +7,7 @@ defmodule Test.SimpleCase do
 
   using do
     quote do
-      import Euclid.Assertions
+      import Moar.Assertions
     end
   end
 end

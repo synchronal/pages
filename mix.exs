@@ -35,12 +35,12 @@ defmodule Pages.MixProject do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
-      {:euclid, "~> 0.2"},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:floki, "~> 0.32.1"},
       {:gestalt, "~> 1.0"},
       {:jason, "~> 1.3", optional: true},
       {:mix_audit, "~> 1.0", only: :dev, runtime: false},
+      {:moar, "~> 0.1", github: "synchronal/moar", ref: "bd7d61144eb3cb759308fde0e8190c573a6b81ed"},
       {:phoenix, "~> 1.6"},
       {:phoenix_live_view, "~> 0.17.9"}
     ]

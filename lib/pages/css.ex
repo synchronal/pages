@@ -76,7 +76,7 @@ defmodule Pages.Css do
   @spec selector(selector()) :: binary()
   def selector(input) when is_binary(input), do: input
   def selector(input) when is_atom(input), do: input |> to_string() |> selector()
-  def selector(input) when is_list(input), do: reduce(input) |> Euclid.String.squish()
+  def selector(input) when is_list(input), do: reduce(input) |> Moar.String.squish()
 
   @deprecated "Use `selector/1` instead"
   @spec query(selector()) :: binary()
@@ -84,7 +84,7 @@ defmodule Pages.Css do
 
   defp reduce(input, result \\ "")
   defp reduce([head | tail], result), do: result <> reduce(head) <> reduce(tail)
-  defp reduce({k, v}, result) when is_atom(k), do: reduce({k |> to_string() |> Euclid.String.dasherize(), v}, result)
+  defp reduce({k, v}, result) when is_atom(k), do: reduce({k |> to_string() |> Moar.String.dasherize(), v}, result)
   defp reduce({k, v}, result) when is_list(v), do: "#{result} #{k}#{reduce(v)}"
   defp reduce({_k, false}, result), do: result
   defp reduce({k, true}, result), do: "#{result}[#{k}]"

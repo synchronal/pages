@@ -9,7 +9,7 @@ defmodule Pages.HtmlTransformer do
 
   @spec to_attribute_values(Floki.html_tree(), Pages.Html.attr()) :: list()
   def to_attribute_values(html_tree, attribute_name),
-    do: Enum.flat_map(html_tree, &Floki.attribute(&1, Euclid.Atom.to_string(attribute_name)))
+    do: Enum.flat_map(html_tree, &Floki.attribute(&1, Moar.Atom.to_string(attribute_name)))
 
   @spec to_text(Floki.html_node()) :: [binary()]
   def to_text(html_node) when is_tuple(html_node),
