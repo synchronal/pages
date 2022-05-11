@@ -70,8 +70,10 @@ defmodule Pages.Driver.LiveView do
 
   @doc "Go to the given URL, assuming that it will be a new LiveView"
   def visit(%__MODULE__{} = page, path) do
-    {:ok, view, html} = new_live(page.conn, path)
-    %__MODULE__{conn: page.conn, live: view, rendered: html}
+    case new_live(page.conn, path) do
+      {:error, {:redirect, %{to: new_path}}} -> new(page.conn, new_path)
+      {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
+    end
   end
 
   # # #
