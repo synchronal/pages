@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 0.2.3
+
+- `Pages.Driver.LiveView.visit/2` handles redirect responses.
+
 ## 0.2.2
 
 - Update `Moar` dependency to v1.0.0.
