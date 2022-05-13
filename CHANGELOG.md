@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 0.2.5
+
+- add `Pages.rerender` to re-render the page.
+
 ## 0.2.4
 
 - relax compatibility requirements of `Moar` package version.
