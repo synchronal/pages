@@ -28,6 +28,10 @@ defmodule Pages do
   @spec click(Pages.Driver.t(), binary(), Pages.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, title, selector), do: module.click(page, title, selector)
 
+  @doc "Re-renders the page"
+  @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
+  def rerender(%module{} = page), do: module.rerender(page)
+
   @doc "Submits a form without specifying any attributes."
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
   def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)

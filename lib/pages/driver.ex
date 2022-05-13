@@ -14,6 +14,9 @@ defmodule Pages.Driver do
   @callback click(Pages.Driver.t(), binary(), Pages.Css.selector()) ::
               Pages.Driver.t() | no_return()
 
+  @doc "Re-renders the page"
+  @callback rerender(Pages.Driver.t()) :: Pages.Driver.t()
+
   @doc "Submit a form targeted by the given selector."
   @callback submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
 
@@ -27,5 +30,5 @@ defmodule Pages.Driver do
   @doc "Navigate directly to a page."
   @callback visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()
 
-  @optional_callbacks [click: 3, submit_form: 2, submit_form: 4, update_form: 4]
+  @optional_callbacks [click: 3, rerender: 1, submit_form: 2, submit_form: 4, update_form: 4]
 end

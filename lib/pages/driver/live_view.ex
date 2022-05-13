@@ -36,6 +36,10 @@ defmodule Pages.Driver.LiveView do
     |> handle_rendered_result(page)
   end
 
+  @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
+  def rerender(page),
+    do: %{page | rendered: render(page.live)}
+
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
