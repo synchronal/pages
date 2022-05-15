@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- add `t:Floki.html_node/1` to possible `t:Pages.Html.html/0` types.
+
 ## 0.2.5
 
 - add `Pages.rerender` to re-render the page.

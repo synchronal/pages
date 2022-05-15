@@ -54,7 +54,7 @@ defmodule Pages.Html do
   @module_name __MODULE__ |> Module.split() |> Enum.join(".")
 
   @type attr :: binary() | atom()
-  @type html :: binary() | Pages.Driver.t() | Floki.html_tree()
+  @type html :: binary() | Pages.Driver.t() | Floki.html_tree() | Floki.html_node()
   @type selector :: binary() | keyword() | atom()
 
   # # #
