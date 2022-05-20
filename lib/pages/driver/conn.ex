@@ -27,11 +27,15 @@ defmodule Pages.Driver.Conn do
   def new(%Plug.Conn{} = conn),
     do: __struct__(conn: conn)
 
+  # # #
+
   def visit(%__MODULE__{} = page, path) do
     page.conn
     |> Pages.Shim.__dispatch(:get, path)
     |> Pages.new()
   end
+
+  # # #
 
   defimpl String.Chars do
     def to_string(%Pages.Driver.Conn{conn: %Plug.Conn{status: 200} = conn}),
