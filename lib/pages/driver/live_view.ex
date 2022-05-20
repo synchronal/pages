@@ -80,7 +80,8 @@ defmodule Pages.Driver.LiveView do
   @doc "Go to the given URL, assuming that it will be a new LiveView"
   def visit(%__MODULE__{} = page, path) do
     case new_live(page.conn, path) do
-      {:error, {:redirect, %{to: new_path}}} -> new(page.conn, new_path)
+      {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
+      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
       {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
     end
   end
@@ -104,9 +105,10 @@ defmodule Pages.Driver.LiveView do
 
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
+      rendered when is_binary(rendered) -> %{page | rendered: rendered}
       {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
       {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-      rendered -> %{page | rendered: rendered}
+      {:ok, live, html} -> %{page | live: live, rendered: html}
     end
   end
 
