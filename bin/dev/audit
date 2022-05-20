@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
-set -eo pipefail
+set -e
+#o pipefail
 
-mix docs 2>&1 | grep 'warning:' && exit 1
+source "./.medic/_support/cecho.sh"
+source "./.medic/_support/step.sh"
+
+step "checking for docs errors" "mix docs 2>&1 | grep -v 'warning:' || exit 1"
+step "credo" "mix credo --strict"
 
 set -x
-mix credo --strict
+# couldn't get `mix dialyzer`'s output to show when it failed when run via "step"
 mix dialyzer
-mix deps.audit
+
+set +x
+step "audit" "mix deps.audit"
