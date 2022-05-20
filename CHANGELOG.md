@@ -2,8 +2,13 @@
 
 ## Unreleased changes
 
-- add `t:Floki.html_node/1` to possible `t:Pages.Html.html/0` types.
+## 0.3.0
+
 - add `Pages.Driver.LiveView.live_redirect/2`
+
+## 0.2.6
+
+- add `t:Floki.html_node/1` to possible `t:Pages.Html.html/0` types.
 
 ## 0.2.5
 
