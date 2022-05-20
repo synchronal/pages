@@ -40,6 +40,11 @@ defmodule Pages.Driver.LiveView do
   def rerender(page),
     do: %{page | rendered: render(page.live)}
 
+  @doc "Perform a live redirect. Not implemented in `Pages` because it's specific to LiveView."
+  @spec live_redirect(Pages.Driver.t(), binary()) :: Pages.Driver.t()
+  def live_redirect(page, destination_path),
+    do: page.live |> Phoenix.LiveViewTest.live_redirect(to: destination_path) |> handle_rendered_result(page)
+
   @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
@@ -100,6 +105,7 @@ defmodule Pages.Driver.LiveView do
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
       {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
+      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
       rendered -> %{page | rendered: rendered}
     end
   end
