@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.3.1
+
 - `Pages.Driver.LiveView` response handlers catch more cases
   - `:live_redirect` loads directly into another `Pages.Driver.LiveView`
   - `:redirect` loads calls `Pages.new/1`, as the next page may not be a live view
