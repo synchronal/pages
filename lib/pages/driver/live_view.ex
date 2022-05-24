@@ -9,6 +9,8 @@ defmodule Pages.Driver.LiveView do
 
   import Phoenix.LiveViewTest
 
+  alias HtmlQuery, as: Hq
+
   defstruct ~w[conn live rendered]a
 
   @type t() :: %__MODULE__{
@@ -28,10 +30,10 @@ defmodule Pages.Driver.LiveView do
 
   # # #
 
-  @spec click(Pages.Driver.t(), binary(), Pages.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%__MODULE__{} = page, title, selector) do
     page.live
-    |> element(Pages.Css.selector(selector), title)
+    |> element(Hq.Css.selector(selector), title)
     |> render_click()
     |> handle_rendered_result(page)
   end
@@ -45,33 +47,33 @@ defmodule Pages.Driver.LiveView do
   def live_redirect(page, destination_path),
     do: page.live |> Phoenix.LiveViewTest.live_redirect(to: destination_path) |> handle_rendered_result(page)
 
-  @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
-    |> form(Pages.Css.selector(selector))
+    |> form(Hq.Css.selector(selector))
     |> render_submit()
     |> handle_rendered_result(page)
   end
 
-  @spec submit_form(Pages.Driver.t(), Pages.Css.selector(), atom(), Pages.attrs_t()) ::
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) ::
           Pages.Driver.t()
   def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Pages.Css.selector(selector), params)
+    |> form(Hq.Css.selector(selector), params)
     |> render_submit()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
 
-  @spec update_form(Pages.Driver.t(), Pages.Css.selector(), atom(), Pages.attrs_t()) ::
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) ::
           Pages.Driver.t()
   def update_form(%__MODULE__{} = page, selector, schema, attrs) do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Pages.Css.selector(selector), params)
+    |> form(Hq.Css.selector(selector), params)
     |> render_change()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
@@ -113,7 +115,7 @@ defmodule Pages.Driver.LiveView do
   end
 
   defp maybe_trigger_action(%__MODULE__{} = page, params) do
-    case page |> Pages.Html.find("[phx-trigger-action]") do
+    case page |> Hq.find("[phx-trigger-action]") do
       element when not is_nil(element) ->
         page.live
         |> Phoenix.LiveViewTest.form("form[phx-trigger-action]", params)
@@ -125,7 +127,7 @@ defmodule Pages.Driver.LiveView do
     end
   end
 
-  defimpl String.Chars do
+  defimpl String.Chars, for: Pages.Driver.LiveView do
     def to_string(%Pages.Driver.LiveView{rendered: rendered}) when not is_nil(rendered),
       do: rendered
 

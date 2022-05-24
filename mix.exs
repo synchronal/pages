@@ -38,6 +38,7 @@ defmodule Pages.MixProject do
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:floki, "~> 0.32.1"},
       {:gestalt, "~> 1.0"},
+      {:html_query, "~> 0.1"},
       {:jason, "~> 1.3", optional: true},
       {:mix_audit, "~> 1.0", only: :dev, runtime: false},
       {:moar, "~> 1.6"},

@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Extract `Pages.Html` and `Pages.Css` into new `html_query` hex package.
+
 ## 0.3.1
 
 - `Pages.Driver.LiveView` response handlers catch more cases

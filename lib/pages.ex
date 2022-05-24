@@ -15,6 +15,8 @@ defmodule Pages do
     appears as if a `Phoenix.LiveView` is configured, this driver will be used.
   """
 
+  alias HtmlQuery, as: Hq
+
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
   @type html_t() :: Floki.html_tree()
@@ -25,7 +27,7 @@ defmodule Pages do
   def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), binary(), Pages.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, title, selector), do: module.click(page, title, selector)
 
   @doc "Re-renders the page"
@@ -33,15 +35,15 @@ defmodule Pages do
   def rerender(%module{} = page), do: module.rerender(page)
 
   @doc "Submits a form without specifying any attributes."
-  @spec submit_form(Pages.Driver.t(), Pages.Css.selector()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
   def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
 
   @doc "Fills in a form with `attributes` and submits it."
-  @spec submit_form(Pages.Driver.t(), Pages.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
   def submit_form(%module{} = page, selector, schema, attrs), do: module.submit_form(page, selector, schema, attrs)
 
   @doc "Fills in a form with `attributes` without submitting it."
-  @spec update_form(Pages.Driver.t(), Pages.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
   def update_form(%module{} = page, selector, schema, attrs), do: module.update_form(page, selector, schema, attrs)
 
   @doc "Visits `path`."
