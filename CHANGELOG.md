@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.4.0
+
 - Extract `Pages.Html` and `Pages.Css` into new `html_query` hex package.
 
 ## 0.3.1
