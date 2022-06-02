@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Support LiveView 0.16 as well as 0.17
+
 ## 0.4.0
 
 - Extract `Pages.Html` and `Pages.Css` into new `html_query` hex package.

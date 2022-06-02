@@ -41,9 +41,9 @@ defmodule Pages.MixProject do
       {:html_query, "~> 0.1"},
       {:jason, "~> 1.3", optional: true},
       {:mix_audit, "~> 1.0", only: :dev, runtime: false},
-      {:moar, "~> 1.6"},
+      {:moar, "~> 1.10"},
       {:phoenix, "~> 1.6"},
-      {:phoenix_live_view, "~> 0.17.9"}
+      {:phoenix_live_view, ">= 0.16.4 and <= 0.17.9"}
     ]
   end
 
