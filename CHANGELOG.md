@@ -2,9 +2,13 @@
 
 ## Unreleased changes
 
+## 0.4.2
+
+- Support LiveView 0.17.10, and allow future updates.
+
 ## 0.4.1
 
-- Support LiveView 0.16 as well as 0.17
+- Support LiveView 0.16 as well as 0.17.
 
 ## 0.4.0
 
