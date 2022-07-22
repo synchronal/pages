@@ -19,7 +19,6 @@ defmodule Pages do
 
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
-  @type html_t() :: Floki.html_tree()
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()

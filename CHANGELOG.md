@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Remove unused explicit dependency on Floki.
+
 ## 0.4.2
 
 - Support LiveView 0.17.10, and allow future updates.

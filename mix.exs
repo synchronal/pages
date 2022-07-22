@@ -36,7 +36,6 @@ defmodule Pages.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:floki, "~> 0.32.1"},
       {:gestalt, "~> 1.0"},
       {:html_query, "~> 0.1"},
       {:jason, "~> 1.3", optional: true},
