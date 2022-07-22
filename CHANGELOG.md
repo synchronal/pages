@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.4.3
+
 - Remove unused explicit dependency on Floki.
 
 ## 0.4.2
