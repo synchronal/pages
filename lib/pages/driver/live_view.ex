@@ -88,6 +88,17 @@ defmodule Pages.Driver.LiveView do
     end
   end
 
+  @doc """
+  Find a child component, and pass it as a new Page into the given function.
+
+  Rerenders the top-level page upon completion.
+  """
+  def with_child_component(%__MODULE__{live: view} = page, child_id, fun) when is_function(fun, 1) do
+    child = Phoenix.LiveViewTest.find_live_child(view, child_id)
+    fun.(%{page | live: child})
+    Pages.rerender(page)
+  end
+
   # # #
 
   defp new_live(conn, path) do

@@ -30,5 +30,9 @@ defmodule Pages.Driver do
   @doc "Navigate directly to a page."
   @callback visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()
 
-  @optional_callbacks [click: 3, rerender: 1, submit_form: 2, submit_form: 4, update_form: 4]
+  @doc "Target a child component for actions."
+  @callback with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) ::
+              Pages.Driver.t()
+
+  @optional_callbacks [click: 3, rerender: 1, submit_form: 2, submit_form: 4, update_form: 4, with_child_component: 3]
 end

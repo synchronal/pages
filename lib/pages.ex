@@ -48,4 +48,7 @@ defmodule Pages do
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()
   def visit(%module{} = page, path), do: module.visit(page, path)
+
+  @spec with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) :: Pages.Driver.t()
+  def with_child_component(%module{} = page, child_id, fun), do: module.with_child_component(page, child_id, fun)
 end

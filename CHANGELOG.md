@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add `Pages.with_child_component/3` for acting on nested live views.
+
 ## 0.4.3
 
 - Remove unused explicit dependency on Floki.
