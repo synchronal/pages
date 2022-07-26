@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.0
+
 - Add `Pages.with_child_component/3` for acting on nested live views.
 
 ## 0.4.3

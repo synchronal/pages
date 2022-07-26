@@ -20,7 +20,7 @@ See the [API reference](api-reference.html) for more info.
 ```elixir
 def deps do
   [
-    {:pages, "~> 0.4", only: :test}
+    {:pages, "~> 0.5", only: :test}
   ]
 end
 ```
