@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.1
+
 - Documentation updates.
 
 ## 0.5.0
