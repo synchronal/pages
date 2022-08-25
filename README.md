@@ -13,7 +13,7 @@ and may be used as the basis of other drivers.
 breaking changes. While new, this library is undergoing rapid development. A goal is
 to reach a stable API and a `1.0.0` release as soon as possible.
 
-See the [API reference](api-reference.html) for more info.
+See the [API reference](https://hexdocs.pm/pages/api-reference.html) for more info.
 
 ## Installation
 
