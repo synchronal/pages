@@ -39,6 +39,7 @@ defmodule Pages.MixProject do
       {:gestalt, "~> 1.0"},
       {:html_query, "~> 0.1"},
       {:jason, "~> 1.3", optional: true},
+      {:markdown_formatter, "~> 0.1", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
       {:moar, "~> 1.10"},
       {:phoenix, "~> 1.6"},

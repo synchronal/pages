@@ -1,5 +1,12 @@
 # Used by "mix format"
 [
-  inputs: ["{mix,.formatter,.credo}.exs", "{config,lib,test}/**/*.{ex,exs}"],
-  line_length: 120
+  inputs: [
+    "CHANGELOG.md",
+    "LICENSE.md",
+    "{config,lib,test}/**/*.{ex,exs}",
+    "{mix,.formatter,.credo}.exs"
+  ],
+  line_length: 120,
+  markdown: [line_length: 120],
+  plugins: [MarkdownFormatter]
 ]
