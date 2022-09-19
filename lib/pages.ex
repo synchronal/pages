@@ -25,9 +25,12 @@ defmodule Pages do
   def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
   def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
-  @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
-  def click(%module{} = page, title, selector), do: module.click(page, title, selector)
+  @doc """
+  Simulates clicking on an element at `selector` with title `title`.
+  Set the `method` param to `:post` to click on a link that has `data-method=post`.
+  """
+  @spec click(Pages.Driver.t(), :get | :post, binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
 
   @doc "Re-renders the page"
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()

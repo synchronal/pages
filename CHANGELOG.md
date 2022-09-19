@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- `Pages.click` can accept a `:post` param to click on links whose data-method is "post"
+
 ## 0.5.1
 
 - Documentation updates.
