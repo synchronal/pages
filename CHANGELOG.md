@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Fix callback definition for `c:Pages.Driver.click/4`.
+
 ## 0.5.2
 
 - `Pages.click` can accept a `:post` param to click on links whose data-method is "post"

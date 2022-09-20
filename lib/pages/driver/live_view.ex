@@ -30,7 +30,7 @@ defmodule Pages.Driver.LiveView do
 
   # # #
 
-  @spec click(Pages.Driver.t(), :get | :post, binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%__MODULE__{} = page, :get, title, selector) do
     page.live
     |> element(Hq.Css.selector(selector), title)

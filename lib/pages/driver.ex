@@ -13,7 +13,7 @@ defmodule Pages.Driver do
           | Pages.Driver.LiveView.t()
 
   @doc "Click an element within a page."
-  @callback click(Pages.Driver.t(), binary(), Hq.Css.selector()) :: Pages.Driver.t() | no_return()
+  @callback click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t() | no_return()
 
   @doc "Re-renders the page"
   @callback rerender(Pages.Driver.t()) :: Pages.Driver.t()
@@ -34,5 +34,5 @@ defmodule Pages.Driver do
   @callback with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) ::
               Pages.Driver.t()
 
-  @optional_callbacks [click: 3, rerender: 1, submit_form: 2, submit_form: 4, update_form: 4, with_child_component: 3]
+  @optional_callbacks [click: 4, rerender: 1, submit_form: 2, submit_form: 4, update_form: 4, with_child_component: 3]
 end

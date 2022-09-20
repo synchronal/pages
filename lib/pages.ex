@@ -19,6 +19,7 @@ defmodule Pages do
 
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
+  @type http_method() :: :get | :post
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()
@@ -29,7 +30,7 @@ defmodule Pages do
   Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), :get | :post, binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
 
   @doc "Re-renders the page"

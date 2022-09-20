@@ -32,7 +32,7 @@ defmodule Pages.Driver.Conn do
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), :get | :post, binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(page, :get, title, selector) do
     link = page |> Hq.find!(selector)
     refute_link_method(link)
