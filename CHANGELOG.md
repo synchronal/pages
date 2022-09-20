@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.3
+
 - Fix callback definition for `c:Pages.Driver.click/4`.
 
 ## 0.5.2
