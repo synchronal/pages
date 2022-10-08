@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.4
+
 - Relax phoenix_live_view version restriction to allow for v0.18
 
 ## 0.5.3
