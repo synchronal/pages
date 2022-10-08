@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Relax phoenix_live_view version restriction to allow for v0.18
+
 ## 0.5.3
 
 - Fix callback definition for `c:Pages.Driver.click/4`.

@@ -1,4 +1,6 @@
 defmodule Pages.Shim do
+  # credo:disable-for-this-file
+
   @moduledoc false
 
   ## Pages.Shim is used to unwrap macros provided by Phoenix which require
@@ -21,7 +23,29 @@ defmodule Pages.Shim do
   end
 
   def __follow_trigger_action(form, conn) do
-    {method, path, form_data} = Phoenix.LiveViewTest.__render_trigger_event__(form)
-    __dispatch(conn, method, path, form_data)
+    test_module = Phoenix.LiveViewTest
+    old_function = :__render_trigger_event__
+    new_function = :__render_trigger_submit__
+
+    cond do
+      function_exported?(test_module, old_function, 1) ->
+        {method, path, form_data} = apply(test_module, old_function, [form])
+        __dispatch(conn, method, path, form_data)
+
+      function_exported?(test_module, new_function, 4) ->
+        {method, path, form_data} =
+          apply(test_module, new_function, [
+            form,
+            :follow_trigger_action,
+            "phx-trigger-action",
+            "could not follow trigger action because form #{inspect(form.selector)} " <>
+              "does not have a phx-trigger-action attribute"
+          ])
+
+        __dispatch(conn, method, path, form_data)
+
+      true ->
+        raise "This version of #{test_module} does not define #{old_function} or #{new_function}"
+    end
   end
 end
