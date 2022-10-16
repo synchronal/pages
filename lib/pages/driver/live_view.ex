@@ -108,11 +108,14 @@ defmodule Pages.Driver.LiveView do
     cond do
       is_binary(path) ->
         conn
+        |> Phoenix.ConnTest.ensure_recycled()
         |> Pages.Shim.__dispatch(:get, path)
         |> Phoenix.LiveViewTest.__live__(path)
 
       is_nil(path) ->
-        Phoenix.LiveViewTest.__live__(conn)
+        conn
+        |> Phoenix.ConnTest.ensure_recycled()
+        |> Phoenix.LiveViewTest.__live__()
 
       true ->
         raise RuntimeError, "path must be nil or a binary, got: #{inspect(path)}"

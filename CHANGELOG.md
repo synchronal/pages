@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Recycle the `conn` before starting a new live view.
+
 ## 0.5.4
 
 - Relax phoenix_live_view version restriction to allow for v0.18
