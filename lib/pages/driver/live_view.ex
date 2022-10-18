@@ -30,7 +30,9 @@ defmodule Pages.Driver.LiveView do
 
   # # #
 
+  @doc "Called from `Pages.click/4` when the given page is a LiveView."
   @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @impl Pages.Driver
   def click(%__MODULE__{} = page, :get, title, selector) do
     page.live
     |> element(Hq.Css.selector(selector), title)
@@ -41,16 +43,24 @@ defmodule Pages.Driver.LiveView do
   def click(%__MODULE__{} = page, :post, title, selector),
     do: Pages.Driver.Conn.click(page, :post, title, selector)
 
+  @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
+  @impl Pages.Driver
   def rerender(page),
     do: %{page | rendered: render(page.live)}
 
-  @doc "Perform a live redirect. Not implemented in `Pages` because it's specific to LiveView."
+  @doc """
+  Perform a live redirect to the given path.
+
+  This is not implemented in `Pages` due to its specificity to LiveView and LiveViewTest.
+  """
   @spec live_redirect(Pages.Driver.t(), binary()) :: Pages.Driver.t()
   def live_redirect(page, destination_path),
     do: page.live |> Phoenix.LiveViewTest.live_redirect(to: destination_path) |> handle_rendered_result(page)
 
+  @doc "Called from `Pages.submit_form/2` when the given page is a LiveView."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
+  @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
     |> form(Hq.Css.selector(selector))
@@ -58,8 +68,10 @@ defmodule Pages.Driver.LiveView do
     |> handle_rendered_result(page)
   end
 
+  @doc "Called from `Pages.submit_form/4` when the given page is a LiveView."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) ::
           Pages.Driver.t()
+  @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
     params = [{schema, Map.new(attrs)}]
 
@@ -70,8 +82,10 @@ defmodule Pages.Driver.LiveView do
     |> maybe_trigger_action(params)
   end
 
+  @doc "Called from `Pages.update_form/4` when the given page is a LiveView."
   @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) ::
           Pages.Driver.t()
+  @impl Pages.Driver
   def update_form(%__MODULE__{} = page, selector, schema, attrs) do
     params = [{schema, Map.new(attrs)}]
 
@@ -82,7 +96,14 @@ defmodule Pages.Driver.LiveView do
     |> maybe_trigger_action(params)
   end
 
-  @doc "Go to the given URL, assuming that it will be a new LiveView"
+  @doc """
+  Initialize a `live` with the given path.
+
+  This is called from `Pages.visit/2` when the conn indicates that the pages is a LiveView,
+  and should only be called directly if the parent function does not work for some reason.
+  """
+  @spec visit(Pages.Driver.t(), binary()) :: Pages.Driver.t()
+  @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
     case new_live(page.conn, path) do
       {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
@@ -96,6 +117,7 @@ defmodule Pages.Driver.LiveView do
 
   Rerenders the top-level page upon completion. See `Pages.with_child_component/3`.
   """
+  @impl Pages.Driver
   def with_child_component(%__MODULE__{live: view} = page, child_id, fun) when is_function(fun, 1) do
     child = Phoenix.LiveViewTest.find_live_child(view, child_id)
     fun.(%{page | live: child})
