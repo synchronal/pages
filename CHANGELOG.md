@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.5
+
 - Add text to documentation for interacting wth forms and sub-components.
 - Recycle the `conn` before starting a new live view.
 
