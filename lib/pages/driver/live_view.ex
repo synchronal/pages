@@ -94,7 +94,7 @@ defmodule Pages.Driver.LiveView do
   @doc """
   Find a child component, and pass it as a new Page into the given function.
 
-  Rerenders the top-level page upon completion.
+  Rerenders the top-level page upon completion. See `Pages.with_child_component/3`.
   """
   def with_child_component(%__MODULE__{live: view} = page, child_id, fun) when is_function(fun, 1) do
     child = Phoenix.LiveViewTest.find_live_child(view, child_id)
