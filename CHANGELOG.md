@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.5.7
+
 - Use phoenix 1.6.14 in development to handle audit warning.
 - `Pages.with_child_component/3` raises a `Pages.Error` if no child is found.
 
