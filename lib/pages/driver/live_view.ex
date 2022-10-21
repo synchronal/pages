@@ -120,6 +120,10 @@ defmodule Pages.Driver.LiveView do
   @impl Pages.Driver
   def with_child_component(%__MODULE__{live: view} = page, child_id, fun) when is_function(fun, 1) do
     child = Phoenix.LiveViewTest.find_live_child(view, child_id)
+
+    if !child,
+      do: raise(Pages.Error, "Expected to find a child component with id `#{child_id}`, but found nil")
+
     fun.(%{page | live: child})
     Pages.rerender(page)
   end

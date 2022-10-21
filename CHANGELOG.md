@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- `Pages.with_child_component/3` raises a `Pages.Error` if no child is found.
+
 ## 0.5.6
 
 - Documentation of drivers links back towards `Pages`.
