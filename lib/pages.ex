@@ -50,6 +50,7 @@ defmodule Pages do
   ## Arguments
 
   | name     | decription |
+  | -------- | ---------- |
   | page     | The current page struct. |
   | selector | A CSS selector matching the form. |
   | schema   | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
