@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add `Pages.render_change/3` which is similar to `Phoenix.LiveViewTest.render_change/2`.
+
 ## 0.5.7
 
 - Use phoenix 1.6.14 in development to handle audit warning.

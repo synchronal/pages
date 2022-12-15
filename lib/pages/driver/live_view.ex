@@ -49,6 +49,16 @@ defmodule Pages.Driver.LiveView do
   def rerender(page),
     do: %{page | rendered: render(page.live)}
 
+  @doc "Called from `Paged.render_change/3` when the given page is a LiveView."
+  @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def render_change(%__MODULE__{} = page, selector, value) do
+    page.live
+    |> element(Hq.Css.selector(selector))
+    |> render_change(value)
+    |> handle_rendered_result(page)
+  end
+
   @doc """
   Perform a live redirect to the given path.
 

@@ -33,6 +33,13 @@ defmodule Pages do
   @spec click(Pages.Driver.t(), http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
 
+  @doc """
+  Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
+  a description of the `value` field.
+  """
+  @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
+  def render_change(%module{} = page, selector, value), do: module.render_change(page, selector, value)
+
   @doc "Re-renders the page."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
   def rerender(%module{} = page), do: module.rerender(page)
