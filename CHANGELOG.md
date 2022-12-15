@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.6.0
+
 - Add `Pages.render_change/3` which is similar to `Phoenix.LiveViewTest.render_change/2`.
 
 ## 0.5.7
