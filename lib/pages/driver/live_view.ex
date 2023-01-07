@@ -28,6 +28,9 @@ defmodule Pages.Driver.LiveView do
   def new(%Plug.Conn{} = conn, {:ok, live, rendered}),
     do: __struct__(conn: conn, live: live, rendered: rendered)
 
+  def new(%Plug.Conn{} = conn, {:error, {:live_redirect, %{to: new_path}}}),
+    do: new(conn, new_path)
+
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
