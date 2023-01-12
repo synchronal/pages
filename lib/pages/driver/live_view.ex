@@ -163,10 +163,19 @@ defmodule Pages.Driver.LiveView do
 
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
-      rendered when is_binary(rendered) -> %{page | rendered: rendered}
-      {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-      {:ok, live, html} -> %{page | live: live, rendered: html}
+      rendered when is_binary(rendered) ->
+        %{page | rendered: rendered}
+
+      {:error, {:live_redirect, opts}} ->
+        endpoint = Pages.Shim.__endpoint()
+        {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
+        new(conn, to)
+
+      {:error, {:redirect, %{to: new_path}}} ->
+        Pages.new(page.conn) |> Pages.visit(new_path)
+
+      {:ok, live, html} ->
+        %{page | live: live, rendered: html}
     end
   end
 
