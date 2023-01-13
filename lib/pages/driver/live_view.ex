@@ -7,8 +7,6 @@ defmodule Pages.Driver.LiveView do
 
   @behaviour Pages.Driver
 
-  alias Phoenix.LiveViewTest
-
   alias HtmlQuery, as: Hq
   alias Phoenix.LiveViewTest
 
