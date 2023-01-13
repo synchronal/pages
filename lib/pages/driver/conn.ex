@@ -32,7 +32,7 @@ defmodule Pages.Driver.Conn do
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), binary() | nil, Pages.http_method(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), binary() | nil, http_method(), Hq.Css.selector()) :: Pages.Driver.t()
   @impl Pages.Driver
   def click(page, maybe_title, selector, :get) do
     link = page |> Hq.find!(selector)
