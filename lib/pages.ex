@@ -27,11 +27,11 @@ defmodule Pages do
   def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
   @doc """
-  Simulates clicking on an element at `selector` with title `title` (if provided).
+  Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), http_method(), binary() | nil, Hq.Css.selector()) :: Pages.Driver.t()
-  def click(%module{} = page, selector, title \\ nil, method \\ :get), do: module.click(page, selector, title, method)
+  @spec click(Pages.Driver.t(), http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
 
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for

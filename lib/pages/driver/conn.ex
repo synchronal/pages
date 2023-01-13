@@ -32,28 +32,22 @@ defmodule Pages.Driver.Conn do
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), Hq.Css.selector(), binary() | nil, Pages.http_method()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def click(page, selector, maybe_title, :get) do
+  def click(page, :get, title, selector) do
     link = page |> Hq.find!(selector)
     refute_link_method(link)
-
-    if title = maybe_title do
-      assert_link_text(link, title)
-    end
+    assert_link_text(link, title)
 
     page.conn
     |> Pages.Shim.__dispatch(:get, Hq.attr(link, :href))
     |> Pages.new()
   end
 
-  def click(page, selector, maybe_title, :post) do
+  def click(page, :post, title, selector) do
     link = page |> Hq.find!(selector)
     assert_link_method(link, "post")
-
-    if title = maybe_title do
-      assert_link_text(link, title)
-    end
+    assert_link_text(link, title)
 
     page.conn
     |> Pages.Shim.__dispatch(:post, Hq.attr(link, :href), %{
