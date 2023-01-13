@@ -34,17 +34,17 @@ defmodule Pages.Driver.LiveView do
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
-  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def click(%__MODULE__{} = page, :get, title, selector) do
+  def click(%__MODULE__{} = page, :get, maybe_title, selector) do
     page.live
-    |> LiveViewTest.element(Hq.Css.selector(selector), title)
+    |> LiveViewTest.element(Hq.Css.selector(selector), maybe_title)
     |> LiveViewTest.render_click()
     |> handle_rendered_result(page)
   end
 
-  def click(%__MODULE__{} = page, :post, title, selector),
-    do: Pages.Driver.Conn.click(page, :post, title, selector)
+  def click(%__MODULE__{} = page, :post, maybe_title, selector),
+    do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
@@ -172,10 +172,19 @@ defmodule Pages.Driver.LiveView do
 
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
-      rendered when is_binary(rendered) -> %{page | rendered: rendered}
-      {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-      {:ok, live, html} -> %{page | live: live, rendered: html}
+      rendered when is_binary(rendered) ->
+        %{page | rendered: rendered}
+
+      {:error, {:live_redirect, opts}} ->
+        endpoint = Pages.Shim.__endpoint()
+        {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
+        new(conn, to)
+
+      {:error, {:redirect, %{to: new_path}}} ->
+        Pages.new(page.conn) |> Pages.visit(new_path)
+
+      {:ok, live, html} ->
+        %{page | live: live, rendered: html}
     end
   end
 

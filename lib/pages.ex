@@ -20,6 +20,7 @@ defmodule Pages do
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
   @type http_method() :: :get | :post
+  @type text_filter() :: binary() | Regex.t()
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()
@@ -30,8 +31,18 @@ defmodule Pages do
   Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
-  def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
+  @spec click(Pages.Driver.t(), http_method(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, method, title, selector), do: module.click(page, method, title, selector)
+
+  @spec click(Pages.Driver.t(), http_method(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, :get, selector), do: module.click(page, :get, nil, selector)
+  def click(%module{} = page, :post, selector), do: module.click(page, :post, nil, selector)
+
+  @spec click(Pages.Driver.t(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, title, selector), do: module.click(page, :get, title, selector)
+
+  @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, selector), do: module.click(page, :get, nil, selector)
 
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for

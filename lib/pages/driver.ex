@@ -13,7 +13,8 @@ defmodule Pages.Driver do
           | Pages.Driver.LiveView.t()
 
   @doc "Click an element within a page. Implementation for `Pages.click/4`."
-  @callback click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t() | no_return()
+  @callback click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) ::
+              Pages.Driver.t() | no_return()
 
   @doc "Render a change. Implementation for `Pages.render_change/3`."
   @callback render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
