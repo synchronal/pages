@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+## 0.7.0
+
+- The `title` param in `Pages.click` is now optional. Thanks Andrew!
+- Added `Pages.render_hook/3` and `Pages.render_upload/4`. Thanks Andrew!
+
 ## 0.6.2
 
 - Properly handle LiveView redirects. Thanks Andrew!

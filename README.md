@@ -21,7 +21,7 @@ See the [API reference](https://hexdocs.pm/pages/api-reference.html) for more in
 ```elixir
 def deps do
   [
-    {:pages, "~> 0.6", only: :test}
+    {:pages, "~> 0.7", only: :test}
   ]
 end
 ```
