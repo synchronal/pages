@@ -7,7 +7,7 @@ defmodule Pages.Driver.LiveView do
 
   @behaviour Pages.Driver
 
-  import Phoenix.LiveViewTest
+  alias Phoenix.LiveViewTest
 
   alias HtmlQuery, as: Hq
   alias Phoenix.LiveViewTest
@@ -35,31 +35,40 @@ defmodule Pages.Driver.LiveView do
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
-  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def click(%__MODULE__{} = page, :get, title, selector) do
+  def click(%__MODULE__{} = page, :get, maybe_title, selector) do
     page.live
-    |> element(Hq.Css.selector(selector), title)
-    |> render_click()
+    |> LiveViewTest.element(Hq.Css.selector(selector), maybe_title)
+    |> LiveViewTest.render_click()
     |> handle_rendered_result(page)
   end
 
-  def click(%__MODULE__{} = page, :post, title, selector),
-    do: Pages.Driver.Conn.click(page, :post, title, selector)
+  def click(%__MODULE__{} = page, :post, maybe_title, selector),
+    do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
   @impl Pages.Driver
   def rerender(page),
-    do: %{page | rendered: render(page.live)}
+    do: %{page | rendered: LiveViewTest.render(page.live)}
 
   @doc "Called from `Paged.render_change/3` when the given page is a LiveView."
   @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
   @impl Pages.Driver
   def render_change(%__MODULE__{} = page, selector, value) do
     page.live
-    |> element(Hq.Css.selector(selector))
-    |> render_change(value)
+    |> LiveViewTest.element(Hq.Css.selector(selector))
+    |> LiveViewTest.render_change(value)
+    |> handle_rendered_result(page)
+  end
+
+  @doc "Called from `Paged.render_hook/3` when the given page is a LiveView."
+  @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def render_hook(%__MODULE__{} = page, event, value_attrs) do
+    page.live
+    |> LiveViewTest.render_hook(event, value_attrs)
     |> handle_rendered_result(page)
   end
 
@@ -86,8 +95,8 @@ defmodule Pages.Driver.LiveView do
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
-    |> form(Hq.Css.selector(selector))
-    |> render_submit()
+    |> LiveViewTest.form(Hq.Css.selector(selector))
+    |> LiveViewTest.render_submit()
     |> handle_rendered_result(page)
   end
 
@@ -99,8 +108,8 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Hq.Css.selector(selector), params)
-    |> render_submit()
+    |> LiveViewTest.form(Hq.Css.selector(selector), params)
+    |> LiveViewTest.render_submit()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
@@ -113,8 +122,8 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Hq.Css.selector(selector), params)
-    |> render_change()
+    |> LiveViewTest.form(Hq.Css.selector(selector), params)
+    |> LiveViewTest.render_change()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
@@ -173,10 +182,19 @@ defmodule Pages.Driver.LiveView do
 
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
-      rendered when is_binary(rendered) -> %{page | rendered: rendered}
-      {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-      {:ok, live, html} -> %{page | live: live, rendered: html}
+      rendered when is_binary(rendered) ->
+        %{page | rendered: rendered}
+
+      {:error, {:live_redirect, opts}} ->
+        endpoint = Pages.Shim.__endpoint()
+        {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
+        new(conn, to)
+
+      {:error, {:redirect, %{to: new_path}}} ->
+        Pages.new(page.conn) |> Pages.visit(new_path)
+
+      {:ok, live, html} ->
+        %{page | live: live, rendered: html}
     end
   end
 

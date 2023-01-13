@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 0.6.2
+
+- Properly handle LiveView redirects. Thanks Andrew!
+
 ## 0.6.1
 
 - Handle multiple redirects in a row in a LiveView.

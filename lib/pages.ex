@@ -21,6 +21,7 @@ defmodule Pages do
   @type page_type_t() :: :live_view
   @type http_method() :: :get | :post
   @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
+  @type text_filter() :: binary() | Regex.t()
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()
@@ -31,8 +32,18 @@ defmodule Pages do
   Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
-  def click(%module{} = page, method \\ :get, title, selector), do: module.click(page, method, title, selector)
+  @spec click(Pages.Driver.t(), http_method(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, method, title, selector), do: module.click(page, method, title, selector)
+
+  @spec click(Pages.Driver.t(), http_method(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, :get, selector), do: module.click(page, :get, nil, selector)
+  def click(%module{} = page, :post, selector), do: module.click(page, :post, nil, selector)
+
+  @spec click(Pages.Driver.t(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, title, selector), do: module.click(page, :get, title, selector)
+
+  @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, selector), do: module.click(page, :get, nil, selector)
 
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
@@ -48,6 +59,12 @@ defmodule Pages do
   @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.Driver.t()
   def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
     do: module.render_upload(page, upload, entry_name, percent)
+
+  @doc """
+  Sends a hook event to the live view. See `Phoenix.LiveViewTest.render_hook/3` for more information.
+  """
+  @spec render_hook(Pages.Driver.t(), binary(), attrs_t()) :: Pages.Driver.t()
+  def render_hook(%module{} = page, event, value_attrs), do: module.render_hook(page, event, value_attrs)
 
   @doc "Re-renders the page."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
