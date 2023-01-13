@@ -34,17 +34,17 @@ defmodule Pages.Driver.LiveView do
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
-  @spec click(Pages.Driver.t(), Pages.http_method(), binary(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def click(%__MODULE__{} = page, :get, title, selector) do
+  def click(%__MODULE__{} = page, :get, maybe_title, selector) do
     page.live
-    |> element(Hq.Css.selector(selector), title)
+    |> element(Hq.Css.selector(selector), maybe_title)
     |> render_click()
     |> handle_rendered_result(page)
   end
 
-  def click(%__MODULE__{} = page, :post, title, selector),
-    do: Pages.Driver.Conn.click(page, :post, title, selector)
+  def click(%__MODULE__{} = page, :post, maybe_title, selector),
+    do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
