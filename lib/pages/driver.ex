@@ -19,7 +19,7 @@ defmodule Pages.Driver do
   @callback render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
 
   @doc "Render a file upload. Implementation for `Pages.render_upload/4`."
-  @callback render_upload(Pages.Driver.t(), Phoenix.LiveViewTest.Upload.t(), binary(), integer()) :: Pages.Driver.t()
+  @callback render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.Driver.t()
 
   @doc "Re-renders the page. Implementation for `Pages.rerender/1`."
   @callback rerender(Pages.Driver.t()) :: Pages.Driver.t()

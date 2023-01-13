@@ -20,6 +20,7 @@ defmodule Pages do
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
   @type http_method() :: :get | :post
+  @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.Driver.t()
@@ -44,7 +45,7 @@ defmodule Pages do
   Performs an upload of a file input and renders the result. See `Phoenix.LiveViewTest.file_input/4` for
   a description of the `upload` field.
   """
-  @spec render_upload(Pages.Driver.t(), Phoenix.LiveViewTest.Upload.t(), binary(), integer()) :: Pages.Driver.t()
+  @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.Driver.t()
   def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
     do: module.render_upload(page, upload, entry_name, percent)
 

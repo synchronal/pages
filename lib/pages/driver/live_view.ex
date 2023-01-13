@@ -64,7 +64,7 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Paged.render_upload/4` when the given page is a LiveView."
-  @spec render_upload(Pages.Driver.t(), Phoenix.LiveViewTest.Upload.t(), binary(), integer()) :: Pages.Driver.t()
+  @spec render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.Driver.t()
   @impl Pages.Driver
   def render_upload(%__MODULE__{} = page, %Phoenix.LiveViewTest.Upload{} = upload, entry_name, percent) do
     upload
