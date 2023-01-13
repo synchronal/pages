@@ -19,6 +19,9 @@ defmodule Pages.Driver do
   @doc "Render a change. Implementation for `Pages.render_change/3`."
   @callback render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
 
+  @doc "Render a file upload. Implementation for `Pages.render_upload/4`."
+  @callback render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.Driver.t()
+
   @doc "Render a hook event. Implementation for `Pages.render_hook/3`."
   @callback render_hook(Pages.Driver.t(), binary(), Pages.attrs_t()) :: Pages.Driver.t()
 
@@ -44,6 +47,7 @@ defmodule Pages.Driver do
   @optional_callbacks [
     click: 4,
     render_change: 3,
+    render_upload: 4,
     render_hook: 3,
     rerender: 1,
     submit_form: 2,
