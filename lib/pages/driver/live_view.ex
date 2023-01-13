@@ -38,7 +38,7 @@ defmodule Pages.Driver.LiveView do
   @impl Pages.Driver
   def click(%__MODULE__{} = page, :get, title, selector) do
     page.live
-    |> LiveViewTest.element(Hq.Css.selector(selector), maybe_title)
+    |> LiveViewTest.element(Hq.Css.selector(selector), title)
     |> LiveViewTest.render_click()
     |> handle_rendered_result(page)
   end
