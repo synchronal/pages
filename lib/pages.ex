@@ -30,8 +30,8 @@ defmodule Pages do
   Simulates clicking on an element at `selector` with title `title` (if provided).
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), binary() | nil, http_method(), Hq.Css.selector()) :: Pages.Driver.t()
-  def click(%module{} = page, title \\ nil, selector, method \\ :get), do: module.click(page, title, selector, method)
+  @spec click(Pages.Driver.t(), http_method(), binary() | nil, Hq.Css.selector()) :: Pages.Driver.t()
+  def click(%module{} = page, selector, title \\ nil, method \\ :get), do: module.click(page, selector, title, method)
 
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
