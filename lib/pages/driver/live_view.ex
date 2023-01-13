@@ -7,7 +7,7 @@ defmodule Pages.Driver.LiveView do
 
   @behaviour Pages.Driver
 
-  import Phoenix.LiveViewTest
+  alias Phoenix.LiveViewTest
 
   alias HtmlQuery, as: Hq
 
@@ -38,8 +38,8 @@ defmodule Pages.Driver.LiveView do
   @impl Pages.Driver
   def click(%__MODULE__{} = page, :get, maybe_title, selector) do
     page.live
-    |> element(Hq.Css.selector(selector), maybe_title)
-    |> render_click()
+    |> LiveViewTest.element(Hq.Css.selector(selector), maybe_title)
+    |> LiveViewTest.render_click()
     |> handle_rendered_result(page)
   end
 
@@ -50,15 +50,24 @@ defmodule Pages.Driver.LiveView do
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
   @impl Pages.Driver
   def rerender(page),
-    do: %{page | rendered: render(page.live)}
+    do: %{page | rendered: LiveViewTest.render(page.live)}
 
   @doc "Called from `Paged.render_change/3` when the given page is a LiveView."
   @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
   @impl Pages.Driver
   def render_change(%__MODULE__{} = page, selector, value) do
     page.live
-    |> element(Hq.Css.selector(selector))
-    |> render_change(value)
+    |> LiveViewTest.element(Hq.Css.selector(selector))
+    |> LiveViewTest.render_change(value)
+    |> handle_rendered_result(page)
+  end
+
+  @doc "Called from `Paged.render_hook/3` when the given page is a LiveView."
+  @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def render_hook(%__MODULE__{} = page, event, value_attrs) do
+    page.live
+    |> LiveViewTest.render_hook(event, value_attrs)
     |> handle_rendered_result(page)
   end
 
@@ -76,8 +85,8 @@ defmodule Pages.Driver.LiveView do
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
-    |> form(Hq.Css.selector(selector))
-    |> render_submit()
+    |> LiveViewTest.form(Hq.Css.selector(selector))
+    |> LiveViewTest.render_submit()
     |> handle_rendered_result(page)
   end
 
@@ -89,8 +98,8 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Hq.Css.selector(selector), params)
-    |> render_submit()
+    |> LiveViewTest.form(Hq.Css.selector(selector), params)
+    |> LiveViewTest.render_submit()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
@@ -103,8 +112,8 @@ defmodule Pages.Driver.LiveView do
     params = [{schema, Map.new(attrs)}]
 
     page.live
-    |> form(Hq.Css.selector(selector), params)
-    |> render_change()
+    |> LiveViewTest.form(Hq.Css.selector(selector), params)
+    |> LiveViewTest.render_change()
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
