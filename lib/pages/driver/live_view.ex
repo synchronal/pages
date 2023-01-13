@@ -9,8 +9,8 @@ defmodule Pages.Driver.LiveView do
 
   import Phoenix.LiveViewTest
 
-  alias Phoenix.LiveViewTest
   alias HtmlQuery, as: Hq
+  alias Phoenix.LiveViewTest
 
   defstruct ~w[conn live rendered]a
 
