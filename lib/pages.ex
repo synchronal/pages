@@ -40,6 +40,14 @@ defmodule Pages do
   @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
   def render_change(%module{} = page, selector, value), do: module.render_change(page, selector, value)
 
+  @doc """
+  Performs an upload of a file input and renders the result. See `Phoenix.LiveViewTest.file_input/4` for
+  a description of the `upload` field.
+  """
+  @spec render_upload(Pages.Driver.t(), Phoenix.LiveViewTest.Upload.t(), binary(), integer()) :: Pages.Driver.t()
+  def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
+    do: module.render_upload(page, upload, entry_name, percent)
+
   @doc "Re-renders the page."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
   def rerender(%module{} = page), do: module.rerender(page)

@@ -9,6 +9,7 @@ defmodule Pages.Driver.LiveView do
 
   import Phoenix.LiveViewTest
 
+  alias Phoenix.LiveViewTest
   alias HtmlQuery, as: Hq
 
   defstruct ~w[conn live rendered]a
@@ -59,6 +60,15 @@ defmodule Pages.Driver.LiveView do
     page.live
     |> element(Hq.Css.selector(selector))
     |> render_change(value)
+    |> handle_rendered_result(page)
+  end
+
+  @doc "Called from `Paged.render_upload/4` when the given page is a LiveView."
+  @spec render_upload(Pages.Driver.t(), Phoenix.LiveViewTest.Upload.t(), binary(), integer()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def render_upload(%__MODULE__{} = page, %Phoenix.LiveViewTest.Upload{} = upload, entry_name, percent) do
+    upload
+    |> LiveViewTest.render_upload(entry_name, percent)
     |> handle_rendered_result(page)
   end
 
