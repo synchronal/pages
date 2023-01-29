@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.7.1
+
 - Conn driver automatically follows 301 redirects.
 
 ## 0.7.0
