@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Conn driver automatically follows 301 redirects.
+
 ## 0.7.0
 
 - The `title` param in `Pages.click` is now optional. Thanks Andrew!

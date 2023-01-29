@@ -21,8 +21,8 @@ defmodule Pages.Driver.Conn do
       |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
       |> Pages.new()
 
-  def new(%Plug.Conn{status: 302} = conn) do
-    redirect = Phoenix.ConnTest.redirected_to(conn)
+  def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
+    redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
     __struct__(conn: conn) |> visit(redirect)
   end
 
