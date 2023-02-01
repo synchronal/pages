@@ -34,6 +34,10 @@ defmodule Pages.Driver do
   @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/4`."
   @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.Driver.t()
 
+  @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/5`."
+  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
+              Pages.Driver.t()
+
   @doc "Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/4`."
   @callback update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.Driver.t()
 
@@ -52,6 +56,7 @@ defmodule Pages.Driver do
     rerender: 1,
     submit_form: 2,
     submit_form: 4,
+    submit_form: 5,
     update_form: 4,
     with_child_component: 3
   ]

@@ -98,16 +98,19 @@ defmodule Pages.Driver.LiveView do
     |> handle_rendered_result(page)
   end
 
-  @doc "Called from `Pages.submit_form/4` when the given page is a LiveView."
+  @doc "Called from `Pages.submit_form/4` and `Pages.submit_form/5` when the given page is a LiveView."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) ::
           Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
+          Pages.Driver.t()
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
-    params = [{schema, Map.new(attrs)}]
+  def submit_form(%__MODULE__{} = page, selector, schema, form_attrs, hidden_attrs \\ %{}) do
+    params = [{schema, Map.new(form_attrs)}]
+    hidden_params = [{schema, Map.new(hidden_attrs)}]
 
     page.live
     |> LiveViewTest.form(Hq.Css.selector(selector), params)
-    |> LiveViewTest.render_submit()
+    |> LiveViewTest.render_submit(hidden_params)
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end

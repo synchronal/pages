@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- `Pages.submit_form` takes an optional 5th parameter which can be used to set hidden fields.
+
 ## 0.7.1
 
 - Conn driver automatically follows 301 redirects.

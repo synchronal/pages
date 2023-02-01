@@ -78,16 +78,18 @@ defmodule Pages do
   def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
 
   @doc """
-  Fills in a form with `attributes` and submits it.
+  Fills in a form with `attributes` and submits it. Hidden parameters can by send by including
+  a fifth enumerable.
 
   ## Arguments
 
-  | name     | decription |
-  | -------- | ---------- |
-  | page     | The current page struct. |
-  | selector | A CSS selector matching the form. |
-  | schema   | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
-  | attrs    | A map of attributes to send. |
+  | name         | decription |
+  | ------------ | ---------- |
+  | page         | The current page struct. |
+  | selector     | A CSS selector matching the form. |
+  | schema       | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
+  | attrs        | A map of attributes to send. |
+  | hidden_attrs | An optional map or keyword of hidden values to include. |
 
   ## Schema
 
@@ -101,7 +103,13 @@ defmodule Pages do
   and handles `phx-trigger-action` if present.
   """
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
-  def submit_form(%module{} = page, selector, schema, attrs), do: module.submit_form(page, selector, schema, attrs)
+  def submit_form(%module{} = page, selector, schema, attrs),
+    do: module.submit_form(page, selector, schema, attrs)
+
+  @doc "See `Pages.submit_form/4` for more information."
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.Driver.t()
+  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs),
+    do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
 
   @doc """
   Fills in a form with `attributes` without submitting it.
