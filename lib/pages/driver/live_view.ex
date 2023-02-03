@@ -33,6 +33,9 @@ defmodule Pages.Driver.LiveView do
   def new(%Plug.Conn{} = conn, {:error, {:redirect, %{to: new_path}}}),
     do: new(conn, new_path)
 
+  def new(%Plug.Conn{} = conn, {:error, :nosession}),
+    do: new(conn)
+
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
