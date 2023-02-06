@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.9.0
+
 - `Pages.render_hook/4` includes an optional keyword of options. `target: selector` sends the event to a nested live
   component.
 - LiveView page can handle a non-liveview redirect.
