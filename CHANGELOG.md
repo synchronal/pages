@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+- `Pages.render_hook/4` includes an optional keyword of options. `target: selector` sends the event to a nested live
+  component.
+- LiveView page can handle a non-liveview redirect.
+
 ## 0.8.0
 
 - `Pages.submit_form` takes an optional 5th parameter which can be used to set hidden fields.

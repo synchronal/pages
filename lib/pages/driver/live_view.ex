@@ -65,10 +65,13 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Paged.render_hook/3` when the given page is a LiveView."
-  @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t()) :: Pages.Driver.t()
+  @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t(), keyword()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def render_hook(%__MODULE__{} = page, event, value_attrs) do
-    page.live
+  def render_hook(%__MODULE__{} = page, event, value_attrs, options) do
+    case Keyword.get(options, :target) do
+      nil -> page.live
+      target -> page.live |> LiveViewTest.element(target)
+    end
     |> LiveViewTest.render_hook(event, value_attrs)
     |> handle_rendered_result(page)
   end

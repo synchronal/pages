@@ -23,7 +23,7 @@ defmodule Pages.Driver do
   @callback render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.Driver.t()
 
   @doc "Render a hook event. Implementation for `Pages.render_hook/3`."
-  @callback render_hook(Pages.Driver.t(), binary(), Pages.attrs_t()) :: Pages.Driver.t()
+  @callback render_hook(Pages.Driver.t(), binary(), Pages.attrs_t(), keyword()) :: Pages.Driver.t()
 
   @doc "Re-renders the page. Implementation for `Pages.rerender/1`."
   @callback rerender(Pages.Driver.t()) :: Pages.Driver.t()
@@ -52,7 +52,7 @@ defmodule Pages.Driver do
     click: 4,
     render_change: 3,
     render_upload: 4,
-    render_hook: 3,
+    render_hook: 4,
     rerender: 1,
     submit_form: 2,
     submit_form: 4,

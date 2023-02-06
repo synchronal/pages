@@ -61,10 +61,28 @@ defmodule Pages do
     do: module.render_upload(page, upload, entry_name, percent)
 
   @doc """
-  Sends a hook event to the live view. See `Phoenix.LiveViewTest.render_hook/3` for more information.
+  Sends a hook event to the live view.
+
+  ## Arguments
+
+  | name        | decription |
+  | ----------- | ---------- |
+  | page        | The current page struct. |
+  | event       | The event name to send to `handle_event`. |
+  | value_attrs | A map of params to send to `handle_event`. |
+  | opts        | An optional keyword list of options. |
+
+  ## Options
+
+  | name   | description |
+  | ------ | ----------- |
+  | target | The selector of an embedded live componont to receive the event. Example: `#sub-module` |
+
+  See `Phoenix.LiveViewTest.render_hook/3` for more information.
   """
-  @spec render_hook(Pages.Driver.t(), binary(), attrs_t()) :: Pages.Driver.t()
-  def render_hook(%module{} = page, event, value_attrs), do: module.render_hook(page, event, value_attrs)
+  @spec render_hook(Pages.Driver.t(), binary(), attrs_t(), keyword()) :: Pages.Driver.t()
+  def render_hook(%module{} = page, event, value_attrs, opts \\ []),
+    do: module.render_hook(page, event, value_attrs, opts)
 
   @doc "Re-renders the page."
   @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
