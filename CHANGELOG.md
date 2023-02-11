@@ -2,6 +2,9 @@
 
 ## Unreleased changes
 
+- Navigating between pages automatically retains any params set via `Phoenix.LiveViewTest.put_connect_params/2`.
+- Add `Pages.clear_connect_params/1` for manually resetting connect params on a page.
+
 ## 0.9.0
 
 - `Pages.render_hook/4` includes an optional keyword of options. `target: selector` sends the event to a nested live

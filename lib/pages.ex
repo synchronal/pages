@@ -45,6 +45,13 @@ defmodule Pages do
   @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
   def click(%module{} = page, selector), do: module.click(page, :get, nil, selector)
 
+  @doc "Clears out any params set via `Phoenix.LiveViewTest.put_connect_params/2`"
+  @spec clear_connect_params(Pages.Driver.t()) :: Pages.Driver.t()
+  def clear_connect_params(%{conn: conn} = page) do
+    private = Map.drop(conn.private, [:live_view_connect_params])
+    %{page | conn: %{conn | private: private}}
+  end
+
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
   a description of the `value` field.

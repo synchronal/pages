@@ -175,11 +175,13 @@ defmodule Pages.Driver.LiveView do
         conn
         |> Phoenix.ConnTest.ensure_recycled()
         |> Pages.Shim.__dispatch(:get, path)
+        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
         |> Phoenix.LiveViewTest.__live__(path)
 
       is_nil(path) ->
         conn
         |> Phoenix.ConnTest.ensure_recycled()
+        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
         |> Phoenix.LiveViewTest.__live__()
 
       true ->

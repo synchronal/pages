@@ -48,4 +48,10 @@ defmodule Pages.Shim do
         raise "This version of #{test_module} does not define #{old_function} or #{new_function}"
     end
   end
+
+  def __retain_connect_params(conn, original_conn) do
+    if Map.has_key?(original_conn.private, :live_view_connect_params),
+      do: Phoenix.LiveViewTest.put_connect_params(conn, original_conn.private.live_view_connect_params),
+      else: conn
+  end
 end

@@ -44,6 +44,7 @@ defmodule Pages.Driver.Conn do
 
     page.conn
     |> Pages.Shim.__dispatch(:get, Hq.attr(link, :href))
+    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
     |> Pages.new()
   end
 
@@ -60,6 +61,7 @@ defmodule Pages.Driver.Conn do
       "_csrf_token" => Hq.attr(link, "data-csrf"),
       "_method" => "post"
     })
+    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
     |> Pages.new()
   end
 
@@ -67,6 +69,7 @@ defmodule Pages.Driver.Conn do
   def visit(%__MODULE__{} = page, path) do
     page.conn
     |> Pages.Shim.__dispatch(:get, path)
+    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
     |> Pages.new()
   end
 
