@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.10.0
+
 - Navigating between pages automatically retains any params set via `Phoenix.LiveViewTest.put_connect_params/2`.
 - Add `Pages.clear_connect_params/1` for manually resetting connect params on a page.
 
