@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.10.1
+
 - Ensure connect params persists through clicks and trigger actions.
 
 ## 0.10.0
