@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Ensure connect params persists through clicks and trigger actions.
+
 ## 0.10.0
 
 - Navigating between pages automatically retains any params set via `Phoenix.LiveViewTest.put_connect_params/2`.

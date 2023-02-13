@@ -30,7 +30,9 @@ defmodule Pages.Shim do
     cond do
       function_exported?(test_module, old_function, 1) ->
         {method, path, form_data} = apply(test_module, old_function, [form])
+
         __dispatch(conn, method, path, form_data)
+        |> __retain_connect_params(conn)
 
       function_exported?(test_module, new_function, 4) ->
         {method, path, form_data} =
@@ -43,6 +45,7 @@ defmodule Pages.Shim do
           ])
 
         __dispatch(conn, method, path, form_data)
+        |> __retain_connect_params(conn)
 
       true ->
         raise "This version of #{test_module} does not define #{old_function} or #{new_function}"
