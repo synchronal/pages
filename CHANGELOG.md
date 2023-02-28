@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+## 0.11.0
+
+- When a LiveView page navigates to a controller page, `{:error, :nosession}` may be returned when accessing the page via
+  LiveViewTest functions. In that case, we reinitialize our page—it comes back as a `t:Pages.Driver.Conn.t/0`.
+
 ## 0.10.1
 
 - Ensure connect params persists through clicks and trigger actions.
