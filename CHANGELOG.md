@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 0.11.1
+
 - Add necessary configuration to readme.
 
 ## 0.11.0
