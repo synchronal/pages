@@ -26,6 +26,12 @@ def deps do
 end
 ```
 
+Configure your endpoint in `config/test.exs`:
+
+```elixir
+config :pages, :phoenix_endpoint, Web.Endpoint
+```
+
 ## Usage
 
 The typical usage is to create a module for each page of your web app, with functions for each action that a user can

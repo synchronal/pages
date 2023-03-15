@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add necessary configuration to readme.
+
 ## 0.11.0
 
 - When a LiveView page navigates to a controller page, `{:error, :nosession}` may be returned when accessing the page via
