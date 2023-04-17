@@ -137,19 +137,38 @@ defmodule Pages do
     do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
 
   @doc """
-  Fills in a form with `attributes` without submitting it.
+  Updates fields in a form with `attributes` without submitting it.
 
   ## Arguments
 
-  See `submit_form/4` for a full description of arguments.
+  | name     | decription |
+  | -------- | ---------- |
+  | page     | The current page struct. |
+  | selector | A CSS selector matching the form. |
+  | schema   | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
+  | attrs    | A map of attributes to send. |
+  | opts     | A keyword list of options. |
+
+  ## Options
+
+  | name   | type             | description |
+  | ------ | ---------------- | ----------- |
+  | target | `list(binary())` | A list to be sent in the `_target` of the form params, indicating which field has been changes. |
+
+  ## Schema
+
+  This atom determines the key under which attrs will be nested when sent to the server,
+  and corresponds to the atom which an `t:Ecto.Changeset.t/0` serializes to, or the value
+  of `:as` passed to `Phoenix.HTML.Form.form_for/4`.
 
   ## Notes
 
   When used with LiveView, this will trigger `phx-change` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
-  def update_form(%module{} = page, selector, schema, attrs), do: module.update_form(page, selector, schema, attrs)
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.Driver.t()
+  def update_form(%module{} = page, selector, schema, attrs, opts \\ []),
+    do: module.update_form(page, selector, schema, attrs, opts)
 
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()

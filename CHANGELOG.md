@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add options to `Pages.update_form/5`, with ability to specify the field `:target`.
+
 ## 0.11.1
 
 - Add necessary configuration to readme.
