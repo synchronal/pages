@@ -154,10 +154,16 @@ defmodule Pages.Driver.LiveView do
   @spec visit(Pages.Driver.t(), binary()) :: Pages.Driver.t()
   @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
-    case new_live(page.conn, path) do
-      {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-      {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-      {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
+    uri = URI.parse(to_string(path))
+
+    if uri.host in [nil, "localhost"] do
+      case new_live(page.conn, path) do
+        {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
+        {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
+        {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
+      end
+    else
+      {:error, :external, path}
     end
   end
 

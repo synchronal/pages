@@ -67,10 +67,16 @@ defmodule Pages.Driver.Conn do
 
   @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
-    page.conn
-    |> Pages.Shim.__dispatch(:get, path)
-    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    uri = URI.parse(to_string(path))
+
+    if uri.host in [nil, "localhost"] do
+      page.conn
+      |> Pages.Shim.__dispatch(:get, path)
+      |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
+      |> Pages.new()
+    else
+      {:error, :external, path}
+    end
   end
 
   # # #

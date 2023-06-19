@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Pages return `{:error, :external, url}` when given a non-local URL.
+
 ## 0.12.0
 
 - Add options to `Pages.update_form/5`, with ability to specify the field `:target`.
