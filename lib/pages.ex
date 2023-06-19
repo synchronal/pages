@@ -17,6 +17,13 @@ defmodule Pages do
 
   alias HtmlQuery, as: Hq
 
+  @typedoc """
+  In most cases, when interacting with pages, a new page will be returned (either a
+  `%Pages.Driver.LiveView{}` or a `%Pages.Driver.Conn{}`). When actions redirect to
+  an external URL, `Pages` functions will return a tuple with `{:error, :external, url}`
+  """
+  @type result() :: Pages.Driver.t() | {:error, :external, Path.t()}
+
   @type attrs_t() :: Keyword.t() | map()
   @type page_type_t() :: :live_view
   @type http_method() :: :get | :post
@@ -24,7 +31,7 @@ defmodule Pages do
   @type text_filter() :: binary() | Regex.t()
 
   @doc "Instantiates a new page."
-  @spec new(Plug.Conn.t()) :: Pages.Driver.t()
+  @spec new(Plug.Conn.t()) :: Pages.result()
   def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
   def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
@@ -32,21 +39,21 @@ defmodule Pages do
   Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
-  @spec click(Pages.Driver.t(), http_method(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), http_method(), text_filter(), Hq.Css.selector()) :: Pages.result()
   def click(%module{} = page, method, title, selector), do: module.click(page, method, title, selector)
 
-  @spec click(Pages.Driver.t(), http_method(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), http_method(), Hq.Css.selector()) :: Pages.result()
   def click(%module{} = page, :get, selector), do: module.click(page, :get, nil, selector)
   def click(%module{} = page, :post, selector), do: module.click(page, :post, nil, selector)
 
-  @spec click(Pages.Driver.t(), text_filter(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), text_filter(), Hq.Css.selector()) :: Pages.result()
   def click(%module{} = page, title, selector), do: module.click(page, :get, title, selector)
 
-  @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
   def click(%module{} = page, selector), do: module.click(page, :get, nil, selector)
 
   @doc "Clears out any params set via `Phoenix.LiveViewTest.put_connect_params/2`"
-  @spec clear_connect_params(Pages.Driver.t()) :: Pages.Driver.t()
+  @spec clear_connect_params(Pages.Driver.t()) :: Pages.result()
   def clear_connect_params(%{conn: conn} = page) do
     private = Map.drop(conn.private, [:live_view_connect_params])
     %{page | conn: %{conn | private: private}}
@@ -56,14 +63,14 @@ defmodule Pages do
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
   a description of the `value` field.
   """
-  @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.Driver.t()
+  @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
   def render_change(%module{} = page, selector, value), do: module.render_change(page, selector, value)
 
   @doc """
   Performs an upload of a file input and renders the result. See `Phoenix.LiveViewTest.file_input/4` for
   a description of the `upload` field.
   """
-  @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.Driver.t()
+  @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.result()
   def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
     do: module.render_upload(page, upload, entry_name, percent)
 
@@ -87,19 +94,19 @@ defmodule Pages do
 
   See `Phoenix.LiveViewTest.render_hook/3` for more information.
   """
-  @spec render_hook(Pages.Driver.t(), binary(), attrs_t(), keyword()) :: Pages.Driver.t()
+  @spec render_hook(Pages.Driver.t(), binary(), attrs_t(), keyword()) :: Pages.result()
   def render_hook(%module{} = page, event, value_attrs, opts \\ []),
     do: module.render_hook(page, event, value_attrs, opts)
 
   @doc "Re-renders the page."
-  @spec rerender(Pages.Driver.t()) :: Pages.Driver.t()
+  @spec rerender(Pages.Driver.t()) :: Pages.result()
   def rerender(%module{} = page), do: module.rerender(page)
 
   @doc """
   Submits a form without specifying any attributes. This function will submit any values
   currently set in the form HTML.
   """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
   def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
 
   @doc """
@@ -127,12 +134,12 @@ defmodule Pages do
   When used with LiveView, this will trigger `phx-submit` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.result()
   def submit_form(%module{} = page, selector, schema, attrs),
     do: module.submit_form(page, selector, schema, attrs)
 
   @doc "See `Pages.submit_form/4` for more information."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.Driver.t()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.result()
   def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs),
     do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
 
@@ -166,12 +173,12 @@ defmodule Pages do
   When used with LiveView, this will trigger `phx-change` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.Driver.t()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
   def update_form(%module{} = page, selector, schema, attrs, opts \\ []),
     do: module.update_form(page, selector, schema, attrs, opts)
 
   @doc "Visits `path`."
-  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.Driver.t()
+  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
   def visit(%module{} = page, path), do: module.visit(page, path)
 
   @doc """

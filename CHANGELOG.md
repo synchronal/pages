@@ -2,6 +2,7 @@
 
 ## Unreleased changes
 
+- Add `t:Pages.result/0` to reflect that any function may return an error.
 - Pages return `{:error, :external, url}` when given a non-local URL.
 
 ## 0.12.0
