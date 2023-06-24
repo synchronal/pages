@@ -37,7 +37,7 @@ defmodule Pages.MixProject do
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:gestalt, "~> 1.0"},
-      {:html_query, "~> 0.1"},
+      {:html_query, "~> 1.0"},
       {:jason, "~> 1.3", optional: true},
       {:markdown_formatter, "~> 0.1", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
