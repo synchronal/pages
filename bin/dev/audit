@@ -6,6 +6,8 @@ set -e
 source "./.medic/_support/cecho.sh"
 source "./.medic/_support/step.sh"
 
+bin/dev/validate-related-annotations --e ex --e exs --d lib --d test
+
 step "checking for docs errors" "mix docs 2>&1 | grep -v 'warning:' || exit 1"
 step "credo" "mix credo --strict"
 
