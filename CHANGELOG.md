@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.13.1
+
+- Update `HtmlQuery` dependency to a new major version.
+
 ## 0.13.0
 
 - Add `t:Pages.result/0` to reflect that any function may return an error.
