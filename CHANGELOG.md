@@ -1,5 +1,8 @@
 # Changelog
 
+- Update documentation for `Pages.Driver.LiveView.live_redirect/2` to note how to set up tests for live redirects to work
+  between live sessions.
+
 ## 0.13.1
 
 - Update `HtmlQuery` dependency to a new major version.

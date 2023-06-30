@@ -92,6 +92,18 @@ defmodule Pages.Driver.LiveView do
   @doc """
   Perform a live redirect to the given path.
 
+  When issuing a live_redirect from one live view to another live view where the
+  routes cross between two `live_session`s, then live view will not just remount
+  the socket, but will issue a redirect. In this case, if the test pages have been
+  initialized via `Phoenix.ConnTest.build_conn/0`, the test adapter will have the
+  URI host set to be `www.example.com`... the live_redirect will be seen as an
+  external redirect.
+
+  When using `live_redirect/2` between two live sessions, ensure that the initial
+  test setup (for example in ConnCase) instead calls
+  `Phoenix.ConnTest.build_conn(:get, "http://localhost:4002/")`, so that redirects
+  are seen as internal redirects.
+
   This is not implemented in `Pages` due to its specificity to LiveView and LiveViewTest.
   """
   @spec live_redirect(Pages.Driver.t(), binary()) :: Pages.result()
