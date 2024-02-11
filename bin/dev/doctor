@@ -16,13 +16,13 @@ fi
 cecho --green "\n▸" --bright-bold-cyan "Running initial doctor checks..."
 
 check "tool-versions: installed" \
-  "command -v asdf || command -v rtx" \
+  "command -v asdf || command -v mise" \
   "open 'https://asdf-vm.com/#/core-manage-asdf'"
 
 if command -v asdf; then
   TOOLS="asdf"
-elif command -v rtx; then
-  TOOLS="rtx"
+elif command -v mise; then
+  TOOLS="mise"
 fi
 
 check "tool-versions: erlang plugin installed" \
