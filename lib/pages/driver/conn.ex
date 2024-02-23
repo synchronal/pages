@@ -9,7 +9,7 @@ defmodule Pages.Driver.Conn do
 
   alias HtmlQuery, as: Hq
 
-  defstruct ~w[conn]a
+  defstruct conn: nil, private: %{}
 
   @type t() :: %__MODULE__{
           conn: Plug.Conn.t()
@@ -29,12 +29,28 @@ defmodule Pages.Driver.Conn do
   def new(%Plug.Conn{} = conn),
     do: __struct__(conn: conn)
 
+  defp get_private(%__MODULE__{private: private}, key) do
+    Map.get(private, key, :not_found)
+  end
+
+  defp pop_private(%__MODULE__{private: private} = session, key) do
+    {popped, rest_private} = Map.pop(private, key, %{})
+    {popped, %{session | private: rest_private}}
+  end
+
+  defp put_private(%__MODULE__{private: private} = session, key, value) do
+    updated_private = Map.put(private, key, value)
+    %{session | private: updated_private}
+  end
+
+
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
   @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.result()
   @impl Pages.Driver
   def click(page, :get, maybe_title, selector) do
+    # TODO consider if data_attribute_form? logic from GV
     link = page |> Hq.find!(selector)
     refute_link_method(link)
 
@@ -78,6 +94,59 @@ defmodule Pages.Driver.Conn do
       {:error, :external, path}
     end
   end
+
+  @impl Pages.Driver
+  def update_form(%__MODULE__{} = page, selector, schema, attrs) do
+    update_form(page, selector, %{schema => attrs})
+  end
+
+  @impl Pages.Driver
+  def update_form(%__MODULE__{} = page, selector, form_data) do
+    form =
+      page
+      |> Hq.find!(selector)
+      |> Pages.HtmlForm.build()
+
+    :ok = Pages.HtmlForm.validate_form_data!(form, form_data)
+    active_form = %{selector: selector, form_data: form_data, parsed: form}
+
+    put_private(page, :active_form, active_form)
+  end
+
+  @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
+    submit_form(page, selector, %{schema => attrs})
+  end
+
+
+  @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, attrs) do
+    page
+    |> update_form(selector, attrs)
+    |> submit_active_form()
+  end
+
+
+  defp submit_active_form(%__MODULE__{} = page) do
+    {form, page} = pop_private(page, :active_form)
+    action = form.parsed["attributes"]["action"]
+    method = form.parsed["operative_method"]
+
+    page.conn
+    |> Pages.Shim.__dispatch(method, action, form.form_data)
+    |> maybe_redirect(page)
+  end
+
+  defp maybe_redirect(%{status: 302} = conn, page) do
+    path = Phoenix.ConnTest.redirected_to(conn)
+    PhoenixTest.visit(conn, path)
+  end
+
+  defp maybe_redirect(%{status: _} = conn, page) do
+    %{page | conn: conn}
+  end
+
+
 
   # # #
 

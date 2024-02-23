@@ -103,13 +103,6 @@ defmodule Pages do
   def rerender(%module{} = page), do: module.rerender(page)
 
   @doc """
-  Submits a form without specifying any attributes. This function will submit any values
-  currently set in the form HTML.
-  """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-  def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
-
-  @doc """
   Fills in a form with `attributes` and submits it. Hidden parameters can by send by including
   a fifth enumerable.
 
@@ -134,14 +127,18 @@ defmodule Pages do
   When used with LiveView, this will trigger `phx-submit` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, attrs),
-    do: module.submit_form(page, selector, schema, attrs)
-
-  @doc "See `Pages.submit_form/4` for more information."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs),
-    do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
+  def submit_form(page, selector, schema, form_attrs, hidden_attrs) do
+    params = %{schema => Map.new(form_attrs)}
+    submit_form(page, selector, params, hidden_attrs)
+  end
+
+  @doc "See `Pages.submit_form/5` for more information."
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
+  def submit_form(%module{} = page, selector, params \\ %{}, hidden_attrs \\ []) do
+    module.submit_form(page, selector, params, Map.new(hidden_attrs))
+  end
+
 
   @doc """
   Updates fields in a form with `attributes` without submitting it.
@@ -174,12 +171,24 @@ defmodule Pages do
   and handles `phx-trigger-action` if present.
   """
   @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
-  def update_form(%module{} = page, selector, schema, attrs, opts \\ []),
-    do: module.update_form(page, selector, schema, attrs, opts)
+  def update_form(page, selector, schema, attrs, opts) do
+    params = %{schema => Map.new(attrs)}
+    update_form(page, selector, params, opts)
+  end
+
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs_t(), keyword()) :: Pages.result()
+  def update_form(%module{} = page, selector, params, opts \\ []),
+    do: module.update_form(page, selector, params, opts)
+
+  import Phoenix.ConnTest
+  import Phoenix.LiveViewTest
+  @endpoint Application.compile_env(:pages, :phoenix_endpoint)
 
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  def visit(%module{} = page, path), do: module.visit(page, path)
+  def visit(%module{} = page, path) do
+    module.visit(page, path)
+  end
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given

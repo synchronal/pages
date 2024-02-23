@@ -28,18 +28,11 @@ defmodule Pages.Driver do
   @doc "Re-renders the page. Implementation for `Pages.rerender/1`."
   @callback rerender(Pages.Driver.t()) :: Pages.result()
 
-  @doc "Submit a form targeted by the given selector. Implementation for `Pages.submit_form/2`."
-  @callback submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-
-  @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/4`."
-  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
-
-  @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/5`."
-  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
-              Pages.result()
+  @doc "Fills in a form targeted by the given selector and submits it. Implementation for `Pages.submit_form/4`."
+  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Pages.attrs_t()) :: Pages.result()
 
   @doc "Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/4`."
-  @callback update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
+  @callback update_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Keyword.t()) :: Pages.result()
 
   @doc "Navigate directly to a page. Implementation for `Pages.visit/2`."
   @callback visit(Pages.Driver.t(), Path.t()) :: Pages.result()
@@ -54,10 +47,6 @@ defmodule Pages.Driver do
     render_upload: 4,
     render_hook: 4,
     rerender: 1,
-    submit_form: 2,
-    submit_form: 4,
-    submit_form: 5,
-    update_form: 4,
     with_child_component: 3
   ]
 end
