@@ -113,7 +113,8 @@ defmodule Pages.Driver.LiveView do
   @doc "Called from `Pages.submit_form/4` and `Pages.submit_form/5` when the given page is a LiveView."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Pages.attrs_t()) :: Pages.result()
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, params, hidden_attrs) do
+  def submit_form(%__MODULE__{} = page, selector, %{} = params, %{} = hidden_attrs) do
+    IO.inspect(hidden_attrs, label: "submit form hidden_attrs")
     page.live
     |> LiveViewTest.form(Hq.Css.selector(selector), params)
     |> LiveViewTest.render_submit(hidden_attrs)
@@ -210,7 +211,7 @@ defmodule Pages.Driver.LiveView do
         new(conn, to)
 
       {:error, {:redirect, %{to: new_path}}} ->
-        Pages.new(page.conn) |> Pages.visit(new_path)
+        Pages.visit(page.conn, new_path)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}

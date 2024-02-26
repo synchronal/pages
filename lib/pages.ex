@@ -130,7 +130,8 @@ defmodule Pages do
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.result()
   def submit_form(page, selector, schema, form_attrs, hidden_attrs) do
     params = %{schema => Map.new(form_attrs)}
-    submit_form(page, selector, params, hidden_attrs)
+    hidden_params = %{schema => Map.new(hidden_attrs)}
+    submit_form(page, selector, params, hidden_params)
   end
 
   @doc "See `Pages.submit_form/5` for more information."
