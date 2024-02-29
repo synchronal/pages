@@ -12,9 +12,15 @@ defmodule Pages.Driver.Conn do
   defstruct conn: nil, private: %{}
 
   @type t() :: %__MODULE__{
-          conn: Plug.Conn.t()
+          conn: Plug.Conn.t(),
+          private: map()
         }
 
+  def build(%Plug.Conn{} = conn) do
+    %__MODULE__{conn: conn}
+  end
+
+  @deprecated "use build/1 instead"
   def new(%Plug.Conn{state: :unset} = conn),
     do:
       conn
@@ -114,13 +120,7 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
-    submit_form(page, selector, %{schema => attrs})
-  end
-
-
-  @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, attrs) do
+  def submit_form(%__MODULE__{} = page, selector, attrs, _hidden_attrs) do
     page
     |> update_form(selector, attrs)
     |> submit_active_form()

@@ -181,15 +181,33 @@ defmodule Pages do
   def update_form(%module{} = page, selector, params, opts \\ []),
     do: module.update_form(page, selector, params, opts)
 
-  import Phoenix.ConnTest
-  import Phoenix.LiveViewTest
+  require Phoenix.ConnTest
+  # import Phoenix.LiveViewTest
   @endpoint Application.compile_env(:pages, :phoenix_endpoint)
 
   @doc "Visits `path`."
-  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  def visit(%module{} = page, path) do
-    module.visit(page, path)
+  @spec visit(Plug.Conn.t() | Pages.Driver.t(), Path.t()) :: Pages.result()
+  def visit(%{conn: conn} = _page, path), do: visit(conn, path)
+
+  def visit(%Plug.Conn{} = conn, path) do
+    case Phoenix.ConnTest.get(conn, path) do
+      %{status: 302} = conn ->
+        path = Phoenix.ConnTest.redirected_to(conn)
+
+        if String.starts_with?(path, "http") do
+          {:error, :external, path}
+        else
+          visit(conn, path)
+        end
+
+      %{assigns: %{live_module: _}} = conn ->
+        Pages.Driver.LiveView.build(conn)
+
+      conn ->
+        Pages.Driver.Conn.build(conn)
+    end
   end
+
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given

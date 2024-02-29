@@ -8,6 +8,8 @@ defmodule Pages.Driver.LiveView do
   @behaviour Pages.Driver
 
   alias HtmlQuery, as: Hq
+  import Phoenix.ConnTest
+  import Phoenix.LiveViewTest, only: [live: 1]
   alias Phoenix.LiveViewTest
 
   defstruct ~w[conn live rendered]a
@@ -18,6 +20,22 @@ defmodule Pages.Driver.LiveView do
           rendered: binary() | nil
         }
 
+  def build(%Plug.Conn{} = conn) do
+    # {:ok, view, html} = live(conn)
+    # %__MODULE__{live: view, conn: conn, rendered: html}
+    case live(conn) do
+      {:ok, view, html} ->
+        %__MODULE__{live: view, conn: conn, rendered: html}
+
+      {:error, {:live_redirect, %{to: new_path}}} ->
+        Pages.visit(conn, new_path)
+
+      {:error, {:redirect, %{to: new_path}}} ->
+        Pages.visit(conn, new_path)
+    end
+  end
+
+  @deprecated "use build instead"
   def new(%Plug.Conn{} = conn),
     do: new(conn, conn.request_path)
 
