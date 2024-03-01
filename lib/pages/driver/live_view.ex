@@ -8,8 +8,6 @@ defmodule Pages.Driver.LiveView do
   @behaviour Pages.Driver
 
   alias HtmlQuery, as: Hq
-  import Phoenix.ConnTest
-  import Phoenix.LiveViewTest, only: [live: 1]
   alias Phoenix.LiveViewTest
 
   defstruct ~w[conn live rendered]a
@@ -21,9 +19,7 @@ defmodule Pages.Driver.LiveView do
         }
 
   def build(%Plug.Conn{} = conn) do
-    # {:ok, view, html} = live(conn)
-    # %__MODULE__{live: view, conn: conn, rendered: html}
-    case live(conn) do
+    case Phoenix.LiveViewTest.__live__(conn) do
       {:ok, view, html} ->
         %__MODULE__{live: view, conn: conn, rendered: html}
 
@@ -34,26 +30,6 @@ defmodule Pages.Driver.LiveView do
         Pages.visit(conn, new_path)
     end
   end
-
-#   @deprecated "use build instead"
-#   def new(%Plug.Conn{} = conn),
-#     do: new(conn, conn.request_path)
-
-#   def new(%Plug.Conn{} = conn, request_path) when is_binary(request_path),
-#     do: new(conn, new_live(conn, request_path))
-
-#   def new(%Plug.Conn{} = conn, {:ok, live, rendered}),
-#     do: __struct__(conn: conn, live: live, rendered: rendered)
-
-#   def new(%Plug.Conn{} = conn, {:error, {:live_redirect, %{to: new_path}}}),
-#     do: new(conn, new_path)
-
-#   def new(%Plug.Conn{} = conn, {:error, {:redirect, %{to: new_path}}}),
-#     do: new(conn, new_path)
-
-#   def new(%Plug.Conn{} = conn, {:error, :nosession}),
-#     do: Pages.new(conn)
-
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
@@ -157,28 +133,6 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc """
-  Initialize a `live` with the given path.
-
-  This is called from `Pages.visit/2` when the conn indicates that the pages is a LiveView,
-  and should only be called directly if the parent function does not work for some reason.
-  """
-  @spec visit(Pages.Driver.t(), binary()) :: Pages.result()
-  @impl Pages.Driver
-  def visit(%__MODULE__{} = page, path) do
-    uri = URI.parse(to_string(path))
-
-    if uri.host in [nil, "localhost"] do
-      case new_live(page.conn, path) do
-        {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
-        {:error, {:live_redirect, %{to: new_path}}} -> Pages.visit(page.conn, new_path)
-        {:error, {:redirect, %{to: new_path}}} -> Pages.visit(page.conn, new_path)
-      end
-    else
-      {:error, :external, path}
-    end
-  end
-
-  @doc """
   Find a child component, and pass it as a new Page into the given function.
 
   Rerenders the top-level page upon completion. See `Pages.with_child_component/3`.
@@ -195,26 +149,6 @@ defmodule Pages.Driver.LiveView do
   end
 
   # # #
-
-  defp new_live(conn, path) do
-    cond do
-      is_binary(path) ->
-        conn
-        |> Phoenix.ConnTest.ensure_recycled()
-        |> Pages.Shim.__dispatch(:get, path)
-        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
-        |> Phoenix.LiveViewTest.__live__(path)
-
-      is_nil(path) ->
-        conn
-        |> Phoenix.ConnTest.ensure_recycled()
-        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
-        |> Phoenix.LiveViewTest.__live__()
-
-      true ->
-        raise RuntimeError, "path must be nil or a binary, got: #{inspect(path)}"
-    end
-  end
 
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
@@ -243,7 +177,7 @@ defmodule Pages.Driver.LiveView do
         page.live
         |> Phoenix.LiveViewTest.form("form[phx-trigger-action]", params)
         |> Pages.Shim.__follow_trigger_action(page.conn)
-        |> Pages.new()
+        |> build()
 
       _ ->
         page

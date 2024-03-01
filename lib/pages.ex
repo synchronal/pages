@@ -17,6 +17,10 @@ defmodule Pages do
 
   alias HtmlQuery, as: Hq
 
+  require Phoenix.ConnTest
+
+  @endpoint Application.compile_env(:pages, :phoenix_endpoint)
+
   @typedoc """
   In most cases, when interacting with pages, a new page will be returned (either a
   `%Pages.Driver.LiveView{}` or a `%Pages.Driver.Conn{}`). When actions redirect to
@@ -29,11 +33,6 @@ defmodule Pages do
   @type http_method() :: :get | :post
   @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
   @type text_filter() :: binary() | Regex.t()
-
-  # @doc "Instantiates a new page."
-  # @spec new(Plug.Conn.t()) :: Pages.result()
-  # def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-  # def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
   @doc """
   Simulates clicking on an element at `selector` with title `title`.
@@ -180,10 +179,6 @@ defmodule Pages do
   @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs_t(), keyword()) :: Pages.result()
   def update_form(%module{} = page, selector, params, opts \\ []),
     do: module.update_form(page, selector, params, opts)
-
-  require Phoenix.ConnTest
-  # import Phoenix.LiveViewTest
-  @endpoint Application.compile_env(:pages, :phoenix_endpoint)
 
   @doc "Visits `path`."
   @spec visit(Plug.Conn.t() | Pages.Driver.t(), Path.t()) :: Pages.result()

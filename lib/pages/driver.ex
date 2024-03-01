@@ -34,9 +34,6 @@ defmodule Pages.Driver do
   @doc "Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/4`."
   @callback update_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Keyword.t()) :: Pages.result()
 
-  @doc "Navigate directly to a page. Implementation for `Pages.visit/2`."
-  @callback visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-
   @doc "Target a child component for actions. Implementation for `Pages.with_child_component/3`."
   @callback with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) ::
               Pages.Driver.t()

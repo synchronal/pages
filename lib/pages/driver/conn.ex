@@ -81,12 +81,7 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
-  def update_form(%__MODULE__{} = page, selector, schema, attrs) do
-    update_form(page, selector, %{schema => attrs})
-  end
-
-  @impl Pages.Driver
-  def update_form(%__MODULE__{} = page, selector, form_data) do
+  def update_form(%__MODULE__{} = page, selector, form_data, _opts \\ []) do
     form =
       page
       |> Hq.find!(selector)
