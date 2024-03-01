@@ -30,6 +30,7 @@ defmodule Pages.Driver.LiveView do
         Pages.visit(conn, new_path)
     end
   end
+
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."

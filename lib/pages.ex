@@ -139,7 +139,6 @@ defmodule Pages do
     module.submit_form(page, selector, params, Map.new(hidden_attrs))
   end
 
-
   @doc """
   Updates fields in a form with `attributes` without submitting it.
 
@@ -202,7 +201,6 @@ defmodule Pages do
         Pages.Driver.Conn.build(conn)
     end
   end
-
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given

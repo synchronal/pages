@@ -45,7 +45,6 @@ defmodule Pages.Driver.Conn do
     %{session | private: updated_private}
   end
 
-
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
@@ -100,7 +99,6 @@ defmodule Pages.Driver.Conn do
     |> submit_active_form()
   end
 
-
   defp submit_active_form(%__MODULE__{} = page) do
     {form, page} = pop_private(page, :active_form)
     action = form.parsed["attributes"]["action"]
@@ -119,8 +117,6 @@ defmodule Pages.Driver.Conn do
   defp maybe_redirect(%{status: _} = conn, page) do
     %{page | conn: conn}
   end
-
-
 
   # # #
 

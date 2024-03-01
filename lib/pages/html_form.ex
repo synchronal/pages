@@ -163,4 +163,3 @@ defmodule Pages.HtmlForm do
     Enum.map(map, fn {_k, _v} = a -> a end)
   end
 end
-
