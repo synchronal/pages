@@ -35,24 +35,24 @@ defmodule Pages.Driver.LiveView do
     end
   end
 
-  @deprecated "use build instead"
-  def new(%Plug.Conn{} = conn),
-    do: new(conn, conn.request_path)
+#   @deprecated "use build instead"
+#   def new(%Plug.Conn{} = conn),
+#     do: new(conn, conn.request_path)
 
-  def new(%Plug.Conn{} = conn, request_path) when is_binary(request_path),
-    do: new(conn, new_live(conn, request_path))
+#   def new(%Plug.Conn{} = conn, request_path) when is_binary(request_path),
+#     do: new(conn, new_live(conn, request_path))
 
-  def new(%Plug.Conn{} = conn, {:ok, live, rendered}),
-    do: __struct__(conn: conn, live: live, rendered: rendered)
+#   def new(%Plug.Conn{} = conn, {:ok, live, rendered}),
+#     do: __struct__(conn: conn, live: live, rendered: rendered)
 
-  def new(%Plug.Conn{} = conn, {:error, {:live_redirect, %{to: new_path}}}),
-    do: new(conn, new_path)
+#   def new(%Plug.Conn{} = conn, {:error, {:live_redirect, %{to: new_path}}}),
+#     do: new(conn, new_path)
 
-  def new(%Plug.Conn{} = conn, {:error, {:redirect, %{to: new_path}}}),
-    do: new(conn, new_path)
+#   def new(%Plug.Conn{} = conn, {:error, {:redirect, %{to: new_path}}}),
+#     do: new(conn, new_path)
 
-  def new(%Plug.Conn{} = conn, {:error, :nosession}),
-    do: Pages.new(conn)
+#   def new(%Plug.Conn{} = conn, {:error, :nosession}),
+#     do: Pages.new(conn)
 
   # # #
 
@@ -169,9 +169,9 @@ defmodule Pages.Driver.LiveView do
 
     if uri.host in [nil, "localhost"] do
       case new_live(page.conn, path) do
-        {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-        {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
         {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
+        {:error, {:live_redirect, %{to: new_path}}} -> Pages.visit(page.conn, new_path)
+        {:error, {:redirect, %{to: new_path}}} -> Pages.visit(page.conn, new_path)
       end
     else
       {:error, :external, path}
@@ -225,11 +225,10 @@ defmodule Pages.Driver.LiveView do
         endpoint = Pages.Shim.__endpoint()
         {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
         conn = Pages.Shim.__retain_connect_params(conn, page.conn)
-        new(conn, to)
+        Pages.visit(conn, to)
 
       {:error, {:redirect, %{to: new_path}}} ->
-        Pages.new(page.conn)
-        |> Pages.visit(new_path)
+        Pages.visit(page.conn, new_path)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}

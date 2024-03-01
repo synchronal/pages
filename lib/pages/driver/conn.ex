@@ -20,24 +20,20 @@ defmodule Pages.Driver.Conn do
     %__MODULE__{conn: conn}
   end
 
-  @deprecated "use build/1 instead"
-  def new(%Plug.Conn{state: :unset} = conn),
-    do:
-      conn
-      |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
-      |> Pages.new()
+  # @deprecated "use build/1 instead"
+  # def new(%Plug.Conn{state: :unset} = conn),
+  #   do:
+  #     conn
+  #     |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
+  #     |> Pages.new()
 
-  def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
-    redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
-    __struct__(conn: conn) |> visit(redirect)
-  end
+  # def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
+  #   redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
+  #   __struct__(conn: conn) |> visit(redirect)
+  # end
 
-  def new(%Plug.Conn{} = conn),
-    do: __struct__(conn: conn)
-
-  defp get_private(%__MODULE__{private: private}, key) do
-    Map.get(private, key, :not_found)
-  end
+  # def new(%Plug.Conn{} = conn),
+  #   do: __struct__(conn: conn)
 
   defp pop_private(%__MODULE__{private: private} = session, key) do
     {popped, rest_private} = Map.pop(private, key, %{})
@@ -56,7 +52,6 @@ defmodule Pages.Driver.Conn do
   @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.result()
   @impl Pages.Driver
   def click(page, :get, maybe_title, selector) do
-    # TODO consider if data_attribute_form? logic from GV
     link = page |> Hq.find!(selector)
     refute_link_method(link)
 
@@ -64,10 +59,8 @@ defmodule Pages.Driver.Conn do
       assert_link_text(link, title)
     end
 
-    page.conn
-    |> Pages.Shim.__dispatch(:get, Hq.attr(link, :href))
-    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    href = Hq.attr(link, :href)
+    Pages.visit(page.conn, href)
   end
 
   def click(page, :post, maybe_title, selector) do
@@ -84,21 +77,7 @@ defmodule Pages.Driver.Conn do
       "_method" => "post"
     })
     |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
-  end
-
-  @impl Pages.Driver
-  def visit(%__MODULE__{} = page, path) do
-    uri = URI.parse(to_string(path))
-
-    if uri.host in [nil, "localhost"] do
-      page.conn
-      |> Pages.Shim.__dispatch(:get, path)
-      |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-      |> Pages.new()
-    else
-      {:error, :external, path}
-    end
+    |> build()
   end
 
   @impl Pages.Driver
@@ -137,9 +116,9 @@ defmodule Pages.Driver.Conn do
     |> maybe_redirect(page)
   end
 
-  defp maybe_redirect(%{status: 302} = conn, page) do
+  defp maybe_redirect(%{status: 302} = conn, _page) do
     path = Phoenix.ConnTest.redirected_to(conn)
-    PhoenixTest.visit(conn, path)
+    Pages.visit(conn, path)
   end
 
   defp maybe_redirect(%{status: _} = conn, page) do

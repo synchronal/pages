@@ -30,10 +30,10 @@ defmodule Pages do
   @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
   @type text_filter() :: binary() | Regex.t()
 
-  @doc "Instantiates a new page."
-  @spec new(Plug.Conn.t()) :: Pages.result()
-  def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-  def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
+  # @doc "Instantiates a new page."
+  # @spec new(Plug.Conn.t()) :: Pages.result()
+  # def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
+  # def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
   @doc """
   Simulates clicking on an element at `selector` with title `title`.
