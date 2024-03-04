@@ -20,21 +20,6 @@ defmodule Pages.Driver.Conn do
     %__MODULE__{conn: conn}
   end
 
-  # @deprecated "use build/1 instead"
-  # def new(%Plug.Conn{state: :unset} = conn),
-  #   do:
-  #     conn
-  #     |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
-  #     |> Pages.new()
-
-  # def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
-  #   redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
-  #   __struct__(conn: conn) |> visit(redirect)
-  # end
-
-  # def new(%Plug.Conn{} = conn),
-  #   do: __struct__(conn: conn)
-
   defp pop_private(%__MODULE__{private: private} = session, key) do
     {popped, rest_private} = Map.pop(private, key, %{})
     {popped, %{session | private: rest_private}}
