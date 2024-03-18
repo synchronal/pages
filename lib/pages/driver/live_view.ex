@@ -18,23 +18,18 @@ defmodule Pages.Driver.LiveView do
           rendered: binary() | nil
         }
 
-  def new(%Plug.Conn{} = conn),
-    do: new(conn, conn.request_path)
+  def build(%Plug.Conn{} = conn) do
+    case Phoenix.LiveViewTest.__live__(conn) do
+      {:ok, view, html} ->
+        %__MODULE__{live: view, conn: conn, rendered: html}
 
-  def new(%Plug.Conn{} = conn, request_path) when is_binary(request_path),
-    do: new(conn, new_live(conn, request_path))
+      {:error, {:live_redirect, %{to: new_path}}} ->
+        Pages.visit(conn, new_path)
 
-  def new(%Plug.Conn{} = conn, {:ok, live, rendered}),
-    do: __struct__(conn: conn, live: live, rendered: rendered)
-
-  def new(%Plug.Conn{} = conn, {:error, {:live_redirect, %{to: new_path}}}),
-    do: new(conn, new_path)
-
-  def new(%Plug.Conn{} = conn, {:error, {:redirect, %{to: new_path}}}),
-    do: new(conn, new_path)
-
-  def new(%Plug.Conn{} = conn, {:error, :nosession}),
-    do: Pages.new(conn)
+      {:error, {:redirect, %{to: new_path}}} ->
+        Pages.visit(conn, new_path)
+    end
+  end
 
   # # #
 
@@ -110,73 +105,32 @@ defmodule Pages.Driver.LiveView do
   def live_redirect(page, destination_path),
     do: page.live |> Phoenix.LiveViewTest.live_redirect(to: destination_path) |> handle_rendered_result(page)
 
-  @doc "Called from `Pages.submit_form/2` when the given page is a LiveView."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-  @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector) do
-    page.live
-    |> LiveViewTest.form(Hq.Css.selector(selector))
-    |> LiveViewTest.render_submit()
-    |> handle_rendered_result(page)
-  end
-
   @doc "Called from `Pages.submit_form/4` and `Pages.submit_form/5` when the given page is a LiveView."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
-          Pages.result()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Pages.attrs_t()) :: Pages.result()
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, schema, form_attrs, hidden_attrs \\ %{}) do
-    params = [{schema, Map.new(form_attrs)}]
-    hidden_params = [{schema, Map.new(hidden_attrs)}]
-
+  def submit_form(%__MODULE__{} = page, selector, %{} = params, %{} = hidden_attrs) do
     page.live
     |> LiveViewTest.form(Hq.Css.selector(selector), params)
-    |> LiveViewTest.render_submit(hidden_params)
+    |> LiveViewTest.render_submit(hidden_attrs)
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
   end
 
   @doc "Called from `Pages.update_form/4` when the given page is a LiveView."
-  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), keyword()) ::
-          Pages.result()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), keyword()) :: Pages.result()
   @impl Pages.Driver
-  def update_form(%__MODULE__{} = page, selector, schema, attrs, opts \\ []) do
+  def update_form(%__MODULE__{} = page, selector, params, opts) do
     params =
-      %{schema => Map.new(attrs)}
-      |> then(fn params ->
-        case Keyword.get(opts, :target) do
-          nil -> params
-          target -> Map.put(params, :_target, target)
-        end
-      end)
+      case Keyword.get(opts, :target) do
+        nil -> params
+        target -> Map.put(params, :_target, target)
+      end
 
     page.live
     |> LiveViewTest.form(Hq.Css.selector(selector))
     |> LiveViewTest.render_change(params)
     |> handle_rendered_result(page)
     |> maybe_trigger_action(params)
-  end
-
-  @doc """
-  Initialize a `live` with the given path.
-
-  This is called from `Pages.visit/2` when the conn indicates that the pages is a LiveView,
-  and should only be called directly if the parent function does not work for some reason.
-  """
-  @spec visit(Pages.Driver.t(), binary()) :: Pages.result()
-  @impl Pages.Driver
-  def visit(%__MODULE__{} = page, path) do
-    uri = URI.parse(to_string(path))
-
-    if uri.host in [nil, "localhost"] do
-      case new_live(page.conn, path) do
-        {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-        {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
-        {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
-      end
-    else
-      {:error, :external, path}
-    end
   end
 
   @doc """
@@ -197,26 +151,6 @@ defmodule Pages.Driver.LiveView do
 
   # # #
 
-  defp new_live(conn, path) do
-    cond do
-      is_binary(path) ->
-        conn
-        |> Phoenix.ConnTest.ensure_recycled()
-        |> Pages.Shim.__dispatch(:get, path)
-        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
-        |> Phoenix.LiveViewTest.__live__(path)
-
-      is_nil(path) ->
-        conn
-        |> Phoenix.ConnTest.ensure_recycled()
-        |> then(&Pages.Shim.__retain_connect_params(&1, conn))
-        |> Phoenix.LiveViewTest.__live__()
-
-      true ->
-        raise RuntimeError, "path must be nil or a binary, got: #{inspect(path)}"
-    end
-  end
-
   defp handle_rendered_result(rendered_result, %__MODULE__{} = page) do
     case rendered_result do
       rendered when is_binary(rendered) ->
@@ -226,10 +160,10 @@ defmodule Pages.Driver.LiveView do
         endpoint = Pages.Shim.__endpoint()
         {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
         conn = Pages.Shim.__retain_connect_params(conn, page.conn)
-        new(conn, to)
+        Pages.visit(conn, to)
 
       {:error, {:redirect, %{to: new_path}}} ->
-        Pages.new(page.conn) |> Pages.visit(new_path)
+        Pages.visit(page.conn, new_path)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}
@@ -244,7 +178,7 @@ defmodule Pages.Driver.LiveView do
         page.live
         |> Phoenix.LiveViewTest.form("form[phx-trigger-action]", params)
         |> Pages.Shim.__follow_trigger_action(page.conn)
-        |> Pages.new()
+        |> build()
 
       _ ->
         page
