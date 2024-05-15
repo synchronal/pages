@@ -229,14 +229,12 @@ defmodule Pages.Driver.LiveView do
         new(conn, to)
 
       {:error, {:redirect, %{to: new_path}}} ->
-        Pages.new(page.conn) |> Pages.visit(new_path)
+        page.conn |> Phoenix.ConnTest.ensure_recycled() |> Pages.new() |> Pages.visit(new_path)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}
     end
   end
-
-  defp maybe_trigger_action({:error, type, value}, _params), do: {:error, type, value}
 
   defp maybe_trigger_action(%__MODULE__{} = page, params) do
     case page |> Hq.find("[phx-trigger-action]") do
@@ -250,6 +248,8 @@ defmodule Pages.Driver.LiveView do
         page
     end
   end
+
+  defp maybe_trigger_action(page, _params), do: page
 
   defimpl String.Chars, for: Pages.Driver.LiveView do
     def to_string(%Pages.Driver.LiveView{rendered: rendered}) when not is_nil(rendered),

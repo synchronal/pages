@@ -1,5 +1,7 @@
 # Changelog
 
+- Recycle the conn when redirecting (not live_redirecting) from a LiveView.
+
 ## 0.13.2
 
 - Update documentation for `Pages.Driver.LiveView.live_redirect/2` to note how to set up tests for live redirects to work
