@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.13.3
+
 - Recycle the conn when redirecting (not live_redirecting) from a LiveView.
 
 ## 0.13.2
