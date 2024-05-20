@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.13.4
+
 - Retain connect params (including sessions, for instance) when redirecting from a LiveView.
 
 ## 0.13.3
