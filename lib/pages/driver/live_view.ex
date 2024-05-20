@@ -229,7 +229,11 @@ defmodule Pages.Driver.LiveView do
         new(conn, to)
 
       {:error, {:redirect, %{to: new_path}}} ->
-        page.conn |> Phoenix.ConnTest.ensure_recycled() |> Pages.new() |> Pages.visit(new_path)
+        page.conn
+        |> Phoenix.ConnTest.ensure_recycled()
+        |> Pages.Shim.__retain_connect_params(page.conn)
+        |> Pages.new()
+        |> Pages.visit(new_path)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}
