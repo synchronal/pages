@@ -58,7 +58,8 @@ defmodule Pages.MixProject do
     [
       plt_add_apps: [:ex_unit, :mix],
       plt_add_deps: :app_tree,
-      plt_core_path: "_build/plts/#{Mix.env()}"
+      plt_core_path: "_build/plts/#{Mix.env()}",
+      plt_local_path: "_build/plts/#{Mix.env()}"
     ]
   end
 
