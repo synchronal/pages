@@ -29,6 +29,12 @@ defmodule Pages.MixProject do
     ]
   end
 
+  def cli do
+    [
+      preferred_envs: [credo: :test, dialyzer: :test]
+    ]
+  end
+
   # # #
 
   defp deps do
@@ -52,7 +58,7 @@ defmodule Pages.MixProject do
     [
       plt_add_apps: [:ex_unit, :mix],
       plt_add_deps: :app_tree,
-      plt_core_path: "_build/#{Mix.env()}"
+      plt_core_path: "_build/plts/#{Mix.env()}"
     ]
   end
 
