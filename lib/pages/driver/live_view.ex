@@ -52,6 +52,19 @@ defmodule Pages.Driver.LiveView do
   def click(%__MODULE__{} = page, :post, maybe_title, selector),
     do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
+  @doc "Called from `Pages.handle_redirect/1` when the given page is a LiveView."
+  @spec handle_redirect(Pages.Driver.t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def handle_redirect(page) do
+    {path, _flash} = page.live |> Phoenix.LiveViewTest.assert_redirect()
+
+    page.conn
+    |> Phoenix.ConnTest.ensure_recycled()
+    |> Pages.Shim.__retain_connect_params(page.conn)
+    |> Pages.new()
+    |> Pages.visit(path)
+  end
+
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.result()
   @impl Pages.Driver

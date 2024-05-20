@@ -16,6 +16,9 @@ defmodule Pages.Driver do
   @callback click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) ::
               Pages.result() | no_return()
 
+  @doc "Wait for a server-issued redirect. Implementation for `Pages.handle_redirect/1`."
+  @callback handle_redirect(Pages.Driver.t()) :: Pages.result()
+
   @doc "Render a change. Implementation for `Pages.render_change/3`."
   @callback render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
 
@@ -50,6 +53,7 @@ defmodule Pages.Driver do
 
   @optional_callbacks [
     click: 4,
+    handle_redirect: 1,
     render_change: 3,
     render_upload: 4,
     render_hook: 4,
