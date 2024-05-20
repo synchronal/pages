@@ -14,10 +14,6 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-            allow_warnings: true
-          - pair:
               elixir: 1.14.0
               otp: 25.0
           - pair:
@@ -65,10 +61,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - pair:
-              elixir: 1.13.0
-              otp: 23.3
-            allow_warnings: true
           - pair:
               elixir: 1.14.0
               otp: 25.0
@@ -118,9 +110,6 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
               elixir: 1.14.0
               otp: 25.0
           - pair:
@@ -161,9 +150,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - pair:
-              elixir: 1.13.0
-              otp: 23.3
           - pair:
               elixir: 1.14.0
               otp: 25.0

@@ -17,7 +17,7 @@ defmodule Pages.MixProject do
       description: "Page pattern for interacting with web pages",
       dialyzer: dialyzer(),
       docs: docs(),
-      elixir: "~> 1.12",
+      elixir: "~> 1.14",
       elixirc_paths: elixirc_paths(Mix.env()),
       homepage_url: @scm_url,
       name: "Pages",
