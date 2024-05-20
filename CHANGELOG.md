@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.14.0
+
 - Add `Pages.handle_redirect/1` and callback in `Pages.Driver.LiveView`, for cases when `handle_info/2` may issue a
   redirect to the client.
 - **Breaking change:** Drop support for Elixir 1.13.
