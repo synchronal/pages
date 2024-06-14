@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased changes
+
+- Verify support for Elixir 1.17.0.
+- *Breaking*: Drop support for Elixir older than 1.15.0.
+
 ## 0.14.0
 
 - Add `Pages.handle_redirect/1` and callback in `Pages.Driver.LiveView`, for cases when `handle_info/2` may issue a
