@@ -65,7 +65,7 @@ assert email_addresses == ["alice@example.com", "alice@example.net"]
 ```
 
 
-## Taming Complexity With The Page Object Pattern
+## Optional: Taming Complexity With The Page Object Pattern
 
 In a large web application, test complexity becomes an issue. One way to solve web test complexity is by using
 the [Page Object](https://martinfowler.com/bliki/PageObject.html) pattern for encapsulating each page's content,
