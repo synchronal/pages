@@ -5,34 +5,75 @@
 [![API docs](https://img.shields.io/hexpm/v/pages.svg?label=hexdocs "API docs")](https://hexdocs.pm/pages/Pages.html)
 [![License](http://img.shields.io/github/license/synchronal/pages.svg?style=flat "License")](https://github.com/synchronal/pages/blob/main/LICENSE.md)
 
-An Elixir implementation of the [Page Object](https://martinfowler.com/bliki/PageObject.html) pattern for interacting
-with websites. This library can be used to facilitate testing of Phoenix controllers and LiveView pages in the context
-of ExUnit, and may be used as the basis of other drivers.
+_Pages_ is a tool for testing Phoenix web applications purely in fast asynchronous Elixir tests, without the need for a
+web browser. It can seamlessly move between LiveView-based pages (via
+[Phoenix.LiveViewTest](https://hexdocs.pm/phoenix_live_view/Phoenix.LiveViewTest.html)) and controller-based pages
+(via [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html)), so web tests are as fast as all other unit
+tests.
 
-**Note**: prior to the release of `1.0.0`, minor releases of this library may include
-breaking changes. While new, this library is undergoing rapid development. A goal is
-to reach a stable API and a `1.0.0` release as soon as possible.
+Pages has been used for testing multiple applications over the past 2+ years without much need for API changes.
 
-See the [API reference](https://hexdocs.pm/pages/api-reference.html) for more info, specifically the docs for the
+
+## Quick Overview
+
+### Interacting With A Web App
+
+The `Pages.new/1` function creates a new `Pages.Driver` struct from the conn, and most of the rest of the `Pages`
+functions expect that driver to be passed in as the first argument and will return that driver:
+
+```elixir
+profile_page =
+  conn
+  |> Pages.new()
+  |> Pages.visit(Web.Paths.auth())
+  |> Pages.submit_form("[test-role=auth]", :user, name: "alice", password: "password1234")
+  |> Pages.click("[test-role=my-profile-button]")
+
+# `profile_page` now references a `Pages.Driver.LiveView` struct.
+```
+
+(Curious about `Web.Paths.auth()` above? Read this article: [Web.Paths](https://eahanson.com/articles/web-paths).)
+
+See Pages' [API reference](https://hexdocs.pm/pages/api-reference.html) for more info, specifically the docs for the
 [Pages](https://hexdocs.pm/pages/Pages.html) module.
 
-## Installation
+### Finding Elements On A Page
+
+Instead of having a bespoke API for parsing HTML, Pages allows you to use your favorite HTML parsing
+library.
+
+We naturally recommend the one we built: [`HtmlQuery`](https://hexdocs.pm/html_query/readme.html). It and its XML
+counterpart [`XmlQuery`](https://hexdocs.pm/xml_query/readme.html) have the same concise API. The main functions are:
+`all/2`, `find/2`, `find!/2`, `attr/2`, and `text/1`.
+
+You can use a different library or your own code. The drivers (`Pages.Driver.Conn` and `Pages.Driver.LiveView`)
+implement the `String.Chars` protocol, so you can call `to_string/0` on any page to get its rendered result.
+
+Here's an example of using `HtmlQuery` to get all the email addresses from the `profile_page`:
 
 ```elixir
-def deps do
-  [
-    {:pages, "~> 0.14", only: :test}
-  ]
-end
+alias HtmlQuery, as: Hq
+
+# ...
+
+email_addresses =
+  dashboard_page
+  |> Hq.all("ul[test-role=email-addresses] li")
+  |> Enum.map(&Hq.text/1)
+
+assert email_addresses == ["alice@example.com", "alice@example.net"]
 ```
 
-Configure your endpoint in `config/test.exs`:
 
-```elixir
-config :pages, :phoenix_endpoint, Web.Endpoint
-```
+## Taming Complexity With The Page Object Pattern
 
-## Usage
+In a large web application, test complexity becomes an issue. One way to solve web test complexity is by using
+the [Page Object](https://martinfowler.com/bliki/PageObject.html) pattern for encapsulating each page's content,
+actions, and assertions in its own module.
+
+Using the Pages library does not require implementing the page object pattern, and implementing the page object
+pattern doesn't necessitate using the Pages library. However, we find it to be an extremely effective way to keep
+tests simple so we'll provide an example of implementing the pattern with Pages.
 
 The typical usage is to create a module for each page of your web app, with functions for each action that a user can
 take on that page, and then to call those functions in a test. Note that in this example, `Web` and `Test` are
@@ -41,7 +82,7 @@ top-level modules in the app that's being tested.
 ```elixir
 defmodule Web.HomeLiveTest do
   use Test.ConnCase, async: true
-  
+
   test "has login button", %{conn: conn} do
     conn
     |> Pages.new()
@@ -83,6 +124,35 @@ A page module that you define can work with either a controller-based page or a 
 test workflows that use both controllers and LiveViews.
 
 
+## Installation
+
+```elixir
+def deps do
+  [
+    {:pages, "~> 0.14", only: :test}
+  ]
+end
+```
+
+Configure your endpoint in `config/test.exs`:
+
+```elixir
+config :pages, :phoenix_endpoint, Web.Endpoint
+```
+
+## Alternatives
+
+The relatively recent [`phoenix_test`](https://github.com/germsvel/phoenix_test) library is similar in that it handles
+controller- and LiveView-based tests. Its API style is quite different that Pages' API.
+
+For tests that run in a real browser, the venerable [`Wallaby`](https://github.com/elixir-wallaby/wallaby) is
+the only production-ready choice at the moment.
+
+[`playwright-elixir`](https://github.com/mechanical-orchard/playwright-elixir) is an Elixir driver for Playwright.
+Its readme says that "the features are not yet at parity with other Playwright implementations" but it might be
+worth checking out.
+
+
 ## Under the hood
 
 This library uses functions from [Phoenix.ConnTest](https://hexdocs.pm/phoenix/Phoenix.ConnTest.html) and
@@ -91,8 +161,3 @@ around and therefore can't test any Javascript functionality. To fix this, a dri
 [Wallaby](https://github.com/elixir-wallaby/wallaby) or
 [Playwright Elixir](https://github.com/geometerio/playwright-elixir) would be needed, but one does not yet exist. The
 upside is that Pages-based tests are extremely fast.
-
-
-
-
-
