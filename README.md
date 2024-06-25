@@ -129,7 +129,7 @@ test workflows that use both controllers and LiveViews.
 ```elixir
 def deps do
   [
-    {:pages, "~> 0.14", only: :test}
+    {:pages, "~> 1.0.1", only: :test}
   ]
 end
 ```
