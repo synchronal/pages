@@ -42,7 +42,7 @@ defmodule Pages.MixProject do
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
-      {:gestalt, "~> 1.0"},
+      {:gestalt, "~> 2.0"},
       {:html_query, "~> 1.0"},
       {:jason, "~> 1.3", optional: true},
       {:markdown_formatter, "~> 0.1", only: :dev, runtime: false},
