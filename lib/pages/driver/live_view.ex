@@ -47,13 +47,25 @@ defmodule Pages.Driver.LiveView do
   def click(%__MODULE__{} = page, :post, maybe_title, selector),
     do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
+  @doc "Called from `Pages.handle_redirect/1` when the given page is a LiveView."
+  @spec handle_redirect(Pages.Driver.t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def handle_redirect(page) do
+    {path, _flash} = page.live |> Phoenix.LiveViewTest.assert_redirect()
+
+    page.conn
+    |> Phoenix.ConnTest.ensure_recycled()
+    |> Pages.Shim.__retain_connect_params(page.conn)
+    |> Pages.visit(path)
+  end
+
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.result()
   @impl Pages.Driver
   def rerender(page),
     do: %{page | rendered: LiveViewTest.render(page.live)}
 
-  @doc "Called from `Paged.render_change/3` when the given page is a LiveView."
+  @doc "Called from `Pages.render_change/3` when the given page is a LiveView."
   @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
   @impl Pages.Driver
   def render_change(%__MODULE__{} = page, selector, value) do
@@ -63,7 +75,7 @@ defmodule Pages.Driver.LiveView do
     |> handle_rendered_result(page)
   end
 
-  @doc "Called from `Paged.render_hook/3` when the given page is a LiveView."
+  @doc "Called from `Pages.render_hook/3` when the given page is a LiveView."
   @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t(), keyword()) :: Pages.result()
   @impl Pages.Driver
   def render_hook(%__MODULE__{} = page, event, value_attrs, options) do
@@ -75,7 +87,7 @@ defmodule Pages.Driver.LiveView do
     |> handle_rendered_result(page)
   end
 
-  @doc "Called from `Paged.render_upload/4` when the given page is a LiveView."
+  @doc "Called from `Pages.render_upload/4` when the given page is a LiveView."
   @spec render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.result()
   @impl Pages.Driver
   def render_upload(%__MODULE__{} = page, %Phoenix.LiveViewTest.Upload{} = upload, entry_name, percent) do
@@ -170,8 +182,6 @@ defmodule Pages.Driver.LiveView do
     end
   end
 
-  defp maybe_trigger_action({:error, type, value}, _params), do: {:error, type, value}
-
   defp maybe_trigger_action(%__MODULE__{} = page, params) do
     case page |> Hq.find("[phx-trigger-action]") do
       element when not is_nil(element) ->
@@ -184,6 +194,8 @@ defmodule Pages.Driver.LiveView do
         page
     end
   end
+
+  defp maybe_trigger_action(page, _params), do: page
 
   defimpl String.Chars, for: Pages.Driver.LiveView do
     def to_string(%Pages.Driver.LiveView{rendered: rendered}) when not is_nil(rendered),

@@ -1,5 +1,30 @@
 # Changelog
 
+## Unreleased changes
+
+## 1.0.1
+
+- Readme updates
+
+## 1.0.0
+
+- Verify support for Elixir 1.17.0.
+- *Breaking*: Drop support for Elixir older than 1.15.0.
+
+## 0.14.0
+
+- Add `Pages.handle_redirect/1` and callback in `Pages.Driver.LiveView`, for cases when `handle_info/2` may issue a
+  redirect to the client.
+- **Breaking change:** Drop support for Elixir 1.13.
+
+## 0.13.4
+
+- Retain connect params (including sessions, for instance) when redirecting from a LiveView.
+
+## 0.13.3
+
+- Recycle the conn when redirecting (not live_redirecting) from a LiveView.
+
 ## 0.13.2
 
 - Update documentation for `Pages.Driver.LiveView.live_redirect/2` to note how to set up tests for live redirects to work

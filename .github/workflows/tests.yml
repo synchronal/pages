@@ -14,18 +14,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-            allow_warnings: true
-          - pair:
-              elixir: 1.14.0
+              elixir: 1.15.0
               otp: 25.0
           - pair:
-              elixir: 1.15.7
-              otp: 26.1.2
-          - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Build Test
     runs-on: ubuntu-20.04
     env:
@@ -40,12 +33,12 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-test-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-test-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
@@ -66,18 +59,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-            allow_warnings: true
-          - pair:
-              elixir: 1.14.0
+              elixir: 1.15.0
               otp: 25.0
           - pair:
-              elixir: 1.15.7
-              otp: 26.1.2
-          - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Build Dev
     runs-on: ubuntu-20.04
     env:
@@ -92,12 +78,12 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-dev-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-dev-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
@@ -118,17 +104,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
-              elixir: 1.14.0
+              elixir: 1.15.0
               otp: 25.0
           - pair:
-              elixir: 1.15.7
-              otp: 26.1.2
-          - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Test
     needs: build_test
     runs-on: ubuntu-20.04
@@ -144,12 +124,12 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-test-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-test-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
@@ -162,17 +142,11 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.13.0
-              otp: 23.3
-          - pair:
-              elixir: 1.14.0
+              elixir: 1.15.0
               otp: 25.0
           - pair:
-              elixir: 1.15.7
-              otp: 26.1.2
-          - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Credo + Dialyxir
     needs: build_test
     runs-on: ubuntu-20.04
@@ -188,19 +162,19 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-test-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-test-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache PLTs
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
-          path: priv/plts
+          path: _build/plts
           key: ${{ runner.os }}-test-dialyzer-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Credo
         run: mix credo --strict
@@ -214,8 +188,8 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Audit
     needs: build_dev
     runs-on: ubuntu-20.04
@@ -231,12 +205,12 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-dev-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-dev-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
@@ -255,8 +229,8 @@ jobs:
       matrix:
         include:
           - pair:
-              elixir: 1.16.0
-              otp: 26.2.1
+              elixir: 1.17.0
+              otp: 27.0
     name: Publish to Hex
     if: github.ref == 'refs/heads/main'
     needs:
@@ -274,12 +248,12 @@ jobs:
           otp-version: ${{ matrix.pair.otp }}
           version-type: strict
       - name: Cache deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: deps
           key: ${{ runner.os }}-dev-deps-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}
       - name: Cache _build
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: _build
           key: ${{ runner.os }}-dev-build-v1-${{ hashFiles('**/mix.lock') }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}

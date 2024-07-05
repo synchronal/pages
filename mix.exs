@@ -2,7 +2,7 @@ defmodule Pages.MixProject do
   use Mix.Project
 
   @scm_url "https://github.com/synchronal/pages"
-  @version "0.13.2"
+  @version "1.0.1"
 
   def application do
     [
@@ -17,7 +17,7 @@ defmodule Pages.MixProject do
       description: "Page pattern for interacting with web pages",
       dialyzer: dialyzer(),
       docs: docs(),
-      elixir: "~> 1.12",
+      elixir: "~> 1.15",
       elixirc_paths: elixirc_paths(Mix.env()),
       homepage_url: @scm_url,
       name: "Pages",
@@ -26,6 +26,12 @@ defmodule Pages.MixProject do
       source_url: @scm_url,
       start_permanent: Mix.env() == :prod,
       version: @version
+    ]
+  end
+
+  def cli do
+    [
+      preferred_envs: [credo: :test, dialyzer: :test]
     ]
   end
 
@@ -41,7 +47,7 @@ defmodule Pages.MixProject do
       {:jason, "~> 1.3", optional: true},
       {:markdown_formatter, "~> 0.1", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
-      {:mix_test_interactive, "~> 1.2", only: :dev, runtime: false},
+      {:mix_test_interactive, "~> 2.0", only: :dev, runtime: false},
       {:moar, "~> 1.10"},
       {:phoenix, "~> 1.6"},
       {:phoenix_live_view, "~> 0.16.4 or ~> 0.17"}
@@ -52,7 +58,8 @@ defmodule Pages.MixProject do
     [
       plt_add_apps: [:ex_unit, :mix],
       plt_add_deps: :app_tree,
-      plt_file: {:no_warn, "priv/plts/dialyzer.plt"}
+      plt_core_path: "_build/plts/#{Mix.env()}",
+      plt_local_path: "_build/plts/#{Mix.env()}"
     ]
   end
 

@@ -59,6 +59,13 @@ defmodule Pages do
   end
 
   @doc """
+  Handles cases where the server issues a redirect to the client without a synchronous interaction from the
+  user. This may be used to handle redirects issued from `Phoenix.LiveView.handle_info/2` callbacks, for instance.
+  """
+  @spec handle_redirect(Pages.Driver.t()) :: Pages.result()
+  def handle_redirect(%module{} = page), do: module.handle_redirect(page)
+
+  @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
   a description of the `value` field.
   """
