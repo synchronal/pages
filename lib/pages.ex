@@ -17,6 +17,10 @@ defmodule Pages do
 
   alias HtmlQuery, as: Hq
 
+  require Phoenix.ConnTest
+
+  @endpoint Application.compile_env(:pages, :phoenix_endpoint)
+
   @typedoc """
   In most cases, when interacting with pages, a new page will be returned (either a
   `%Pages.Driver.LiveView{}` or a `%Pages.Driver.Conn{}`). When actions redirect to
@@ -29,11 +33,6 @@ defmodule Pages do
   @type http_method() :: :get | :post
   @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
   @type text_filter() :: binary() | Regex.t()
-
-  @doc "Instantiates a new page."
-  @spec new(Plug.Conn.t()) :: Pages.result()
-  def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-  def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
 
   @doc """
   Simulates clicking on an element at `selector` with title `title`.
@@ -110,13 +109,6 @@ defmodule Pages do
   def rerender(%module{} = page), do: module.rerender(page)
 
   @doc """
-  Submits a form without specifying any attributes. This function will submit any values
-  currently set in the form HTML.
-  """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-  def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
-
-  @doc """
   Fills in a form with `attributes` and submits it. Hidden parameters can by send by including
   a fifth enumerable.
 
@@ -141,14 +133,18 @@ defmodule Pages do
   When used with LiveView, this will trigger `phx-submit` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, attrs),
-    do: module.submit_form(page, selector, schema, attrs)
-
-  @doc "See `Pages.submit_form/4` for more information."
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs),
-    do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
+  def submit_form(page, selector, schema, form_attrs, hidden_attrs) do
+    params = %{schema => Map.new(form_attrs)}
+    hidden_params = %{schema => Map.new(hidden_attrs)}
+    submit_form(page, selector, params, hidden_params)
+  end
+
+  @doc "See `Pages.submit_form/5` for more information."
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
+  def submit_form(%module{} = page, selector, params \\ %{}, hidden_attrs \\ []) do
+    module.submit_form(page, selector, params, Map.new(hidden_attrs))
+  end
 
   @doc """
   Updates fields in a form with `attributes` without submitting it.
@@ -181,12 +177,37 @@ defmodule Pages do
   and handles `phx-trigger-action` if present.
   """
   @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
-  def update_form(%module{} = page, selector, schema, attrs, opts \\ []),
-    do: module.update_form(page, selector, schema, attrs, opts)
+  def update_form(page, selector, schema, attrs, opts) do
+    params = %{schema => Map.new(attrs)}
+    update_form(page, selector, params, opts)
+  end
+
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs_t(), keyword()) :: Pages.result()
+  def update_form(%module{} = page, selector, params, opts \\ []),
+    do: module.update_form(page, selector, params, opts)
 
   @doc "Visits `path`."
-  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  def visit(%module{} = page, path), do: module.visit(page, path)
+  @spec visit(Plug.Conn.t() | Pages.Driver.t(), Path.t()) :: Pages.result()
+  def visit(%{conn: conn} = _page, path), do: visit(conn, path)
+
+  def visit(%Plug.Conn{} = conn, path) do
+    case Phoenix.ConnTest.get(conn, path) do
+      %{status: 302} = conn ->
+        path = Phoenix.ConnTest.redirected_to(conn)
+
+        if String.starts_with?(path, "http") do
+          {:error, :external, path}
+        else
+          visit(conn, path)
+        end
+
+      %{assigns: %{live_module: _}} = conn ->
+        Pages.Driver.LiveView.build(conn)
+
+      conn ->
+        Pages.Driver.Conn.build(conn)
+    end
+  end
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given

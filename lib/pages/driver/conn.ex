@@ -9,25 +9,26 @@ defmodule Pages.Driver.Conn do
 
   alias HtmlQuery, as: Hq
 
-  defstruct ~w[conn]a
+  defstruct conn: nil, private: %{}
 
   @type t() :: %__MODULE__{
-          conn: Plug.Conn.t()
+          conn: Plug.Conn.t(),
+          private: map()
         }
 
-  def new(%Plug.Conn{state: :unset} = conn),
-    do:
-      conn
-      |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
-      |> Pages.new()
-
-  def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
-    redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
-    __struct__(conn: conn) |> visit(redirect)
+  def build(%Plug.Conn{} = conn) do
+    %__MODULE__{conn: conn}
   end
 
-  def new(%Plug.Conn{} = conn),
-    do: __struct__(conn: conn)
+  defp pop_private(%__MODULE__{private: private} = session, key) do
+    {popped, rest_private} = Map.pop(private, key, %{})
+    {popped, %{session | private: rest_private}}
+  end
+
+  defp put_private(%__MODULE__{private: private} = session, key, value) do
+    updated_private = Map.put(private, key, value)
+    %{session | private: updated_private}
+  end
 
   # # #
 
@@ -42,10 +43,8 @@ defmodule Pages.Driver.Conn do
       assert_link_text(link, title)
     end
 
-    page.conn
-    |> Pages.Shim.__dispatch(:get, Hq.attr(link, :href))
-    |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    href = Hq.attr(link, :href)
+    Pages.visit(page.conn, href)
   end
 
   def click(page, :post, maybe_title, selector) do
@@ -62,21 +61,46 @@ defmodule Pages.Driver.Conn do
       "_method" => "post"
     })
     |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    |> build()
   end
 
   @impl Pages.Driver
-  def visit(%__MODULE__{} = page, path) do
-    uri = URI.parse(to_string(path))
+  def update_form(%__MODULE__{} = page, selector, form_data, _opts \\ []) do
+    form =
+      page
+      |> Hq.find!(selector)
+      |> Pages.HtmlForm.build()
 
-    if uri.host in [nil, "localhost"] do
-      page.conn
-      |> Pages.Shim.__dispatch(:get, path)
-      |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-      |> Pages.new()
-    else
-      {:error, :external, path}
-    end
+    :ok = Pages.HtmlForm.validate_form_data!(form, form_data)
+    active_form = %{selector: selector, form_data: form_data, parsed: form}
+
+    put_private(page, :active_form, active_form)
+  end
+
+  @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, attrs, _hidden_attrs) do
+    page
+    |> update_form(selector, attrs)
+    |> submit_active_form()
+  end
+
+  defp submit_active_form(%__MODULE__{} = page) do
+    {form, page} = pop_private(page, :active_form)
+    action = form.parsed["attributes"]["action"]
+    method = form.parsed["operative_method"]
+
+    page.conn
+    |> Pages.Shim.__dispatch(method, action, form.form_data)
+    |> maybe_redirect(page)
+  end
+
+  defp maybe_redirect(%{status: 302} = conn, _page) do
+    path = Phoenix.ConnTest.redirected_to(conn)
+    Pages.visit(conn, path)
+  end
+
+  defp maybe_redirect(%{status: _} = conn, page) do
+    %{page | conn: conn}
   end
 
   # # #
