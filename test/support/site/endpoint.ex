@@ -1,6 +1,6 @@
 defmodule Test.Site.Endpoint do
   @moduledoc false
-  use Phoenix.Endpoint, otp_app: :test
+  use Phoenix.Endpoint, otp_app: :pages
 
   socket("/live", Phoenix.LiveView.Socket)
 
@@ -23,7 +23,7 @@ defmodule Test.Site.Endpoint do
   def config(:live_view), do: [signing_salt: String.duplicate("0", 20)]
   def config(:secret_key_base), do: String.duplicate("abcdefgh", 8)
   def config(:cache_static_manifest_latest), do: Process.get(:cache_static_manifest_latest)
-  def config(:otp_app), do: :phoenix_test
+  def config(:otp_app), do: :pages
   def config(:port), do: Test.Site.port()
   def config(:pubsub_server), do: Phoenix.LiveView.PubSub
   def config(:render_errors), do: [view: __MODULE__]

@@ -6,7 +6,7 @@ defmodule Test.Site.Router do
   pipeline :setup_session do
     plug(Plug.Session,
       store: :cookie,
-      key: "_phoenix_test_key",
+      key: "_pages_test_key",
       signing_salt: "00000000000"
     )
 
@@ -22,6 +22,7 @@ defmodule Test.Site.Router do
   scope "/" do
     pipe_through(:browser)
 
+    live("/live", Test.Site.PageLive)
     get("/pages/show", Test.Site.PageController, :show)
   end
 end
