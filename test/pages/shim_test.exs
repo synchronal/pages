@@ -12,6 +12,8 @@ defmodule Pages.ShimTest do
     end
 
     test "raises if endpoint is not configured" do
+      Gestalt.replace_config(:pages, :phoenix_endpoint, nil, self())
+
       assert_raise RuntimeError, fn ->
         Pages.Shim.__endpoint()
       end
