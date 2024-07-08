@@ -8,5 +8,5 @@
   ],
   line_length: 120,
   markdown: [line_length: 120],
-  plugins: [MarkdownFormatter]
+  plugins: [Phoenix.LiveView.HTMLFormatter, MarkdownFormatter]
 ]
