@@ -2,6 +2,14 @@
 
 ## Unreleased changes
 
+## 1.0.3
+
+- Fix documentation links to `Phoenix.LiveView` and `Phoenix.HTML`.
+
+## 1.0.2
+
+- Loosen version restrictions for gestalt.
+
 ## 1.0.1
 
 - Readme updates
