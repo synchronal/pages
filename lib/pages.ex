@@ -61,7 +61,7 @@ defmodule Pages do
 
   @doc """
   Handles cases where the server issues a redirect to the client without a synchronous interaction from the
-  user. This may be used to handle redirects issued from `Phoenix.LiveView.handle_info/2` callbacks, for instance.
+  user. This may be used to handle redirects issued from `c:Phoenix.LiveView.handle_info/2` callbacks, for instance.
   """
   @spec handle_redirect(Pages.Driver.t()) :: Pages.result()
   def handle_redirect(%module{} = page), do: module.handle_redirect(page)
@@ -134,7 +134,7 @@ defmodule Pages do
 
   This atom determines the key under which attrs will be nested when sent to the server,
   and corresponds to the atom which an `t:Ecto.Changeset.t/0` serializes to, or the value
-  of `:as` passed to `Phoenix.HTML.Form.form_for/4`.
+  of `:as` passed to `Phoenix.HTML.FormData.to_form/4`.
 
   ## Notes
 
@@ -173,7 +173,7 @@ defmodule Pages do
 
   This atom determines the key under which attrs will be nested when sent to the server,
   and corresponds to the atom which an `t:Ecto.Changeset.t/0` serializes to, or the value
-  of `:as` passed to `Phoenix.HTML.Form.form_for/4`.
+  of `:as` passed to `Phoenix.HTML.FormData.to_form/4`.
 
   ## Notes
 
