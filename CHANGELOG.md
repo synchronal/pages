@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 1.1.0
+
 - Allow `Pages.visit/2` to be called with a `Plug.Conn`.
 
 ## 1.0.3
