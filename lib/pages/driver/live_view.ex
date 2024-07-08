@@ -61,7 +61,6 @@ defmodule Pages.Driver.LiveView do
     page.conn
     |> Phoenix.ConnTest.ensure_recycled()
     |> Pages.Shim.__retain_connect_params(page.conn)
-    |> Pages.new()
     |> Pages.visit(path)
   end
 
@@ -184,7 +183,7 @@ defmodule Pages.Driver.LiveView do
     if uri.host in [nil, "localhost"] do
       case new_live(page.conn, path) do
         {:error, {:live_redirect, %{to: new_path}}} -> new(page.conn, new_path)
-        {:error, {:redirect, %{to: new_path}}} -> Pages.new(page.conn) |> Pages.visit(new_path)
+        {:error, {:redirect, %{to: new_path}}} -> page.conn |> Pages.visit(new_path)
         {:ok, view, html} -> %__MODULE__{conn: page.conn, live: view, rendered: html}
       end
     else
@@ -245,7 +244,6 @@ defmodule Pages.Driver.LiveView do
         page.conn
         |> Phoenix.ConnTest.ensure_recycled()
         |> Pages.Shim.__retain_connect_params(page.conn)
-        |> Pages.new()
         |> Pages.visit(new_path)
 
       {:ok, live, html} ->

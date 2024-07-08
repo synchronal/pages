@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Allow `Pages.visit/2` to be called with a `Plug.Conn`.
+
 ## 1.0.3
 
 - Fix documentation links to `Phoenix.LiveView` and `Phoenix.HTML`.
