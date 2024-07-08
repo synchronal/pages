@@ -7,7 +7,7 @@ defmodule Test.Site.Router do
     plug(Plug.Session,
       store: :cookie,
       key: "_phoenix_test_key",
-      signing_salt: "/VADsdfSfdMnp5"
+      signing_salt: "00000000000"
     )
 
     plug(:fetch_session)
