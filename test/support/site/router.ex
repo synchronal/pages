@@ -22,7 +22,6 @@ defmodule Test.Site.Router do
   scope "/" do
     pipe_through(:browser)
 
-    get("/", Test.Site.PageController, :root)
     get("/pages/show", Test.Site.PageController, :show)
   end
 end

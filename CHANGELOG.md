@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Visiting a conn without calling new goes directly to that path without loading `/`.
+
 ## 1.1.0
 
 - Allow `Pages.visit/2` to be called with a `Plug.Conn`.

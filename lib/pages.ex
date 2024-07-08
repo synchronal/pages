@@ -187,7 +187,7 @@ defmodule Pages do
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
   @spec visit(Plug.Conn.t(), Path.t()) :: Pages.result()
-  def visit(%Plug.Conn{} = conn, path), do: Pages.new(conn) |> visit(path)
+  def visit(%Plug.Conn{} = conn, path), do: %{conn | request_path: path} |> Pages.new()
   def visit(%module{} = page, path), do: module.visit(page, path)
 
   @doc """
