@@ -2,7 +2,7 @@ defmodule Pages.MixProject do
   use Mix.Project
 
   @scm_url "https://github.com/synchronal/pages"
-  @version "1.0.1"
+  @version "1.0.2"
 
   def application do
     [
