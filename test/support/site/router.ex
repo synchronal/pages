@@ -22,6 +22,7 @@ defmodule Test.Site.Router do
     pipe_through(:browser)
 
     live("/live", Test.Site.PageLive)
+    live("/live/final", Test.Site.PageLive, :final)
     live("/live/navigate", Test.Site.NavigateLive)
     live("/live/redirect", Test.Site.RedirectLive)
     get("/pages/show", Test.Site.PageController, :show)
