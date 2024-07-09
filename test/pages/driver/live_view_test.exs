@@ -134,4 +134,105 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_rerender_content("1")
     end
   end
+
+  describe "submit_form/2" do
+    test "handles render changes from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", :foo, action: "rerender", value: "rerender")
+      |> assert_input_value("form", "value-input", "rerender")
+      |> Pages.submit_form("#form")
+      |> assert_input_value("form", "value-input", "rerendered")
+    end
+
+    test "follows navigation from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", :foo, action: "rerender", value: "navigate")
+      |> assert_input_value("form", "value-input", "navigate")
+      |> Pages.submit_form("#form")
+      |> assert_here("live/show")
+    end
+
+    test "follows redirects from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", :foo, action: "rerender", value: "redirect")
+      |> assert_input_value("form", "value-input", "redirect")
+      |> Pages.submit_form("#form")
+      |> assert_here("pages/show")
+    end
+
+    test "raises when the form does not have phx-submit", %{conn: conn} do
+      assert_raise ArgumentError, fn ->
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.submit_form("#form-without-phx-attrs")
+      end
+    end
+  end
+
+  describe "submit_form/4" do
+    test "handles render changes from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> assert_input_value("form", "value-input", nil)
+      |> Pages.submit_form("#form", :foo, value: "rerender")
+      |> assert_input_value("form", "value-input", "rerendered")
+    end
+
+    test "follows navigation from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.submit_form("#form", :foo, value: "navigate")
+      |> assert_here("live/show")
+    end
+
+    test "follows redirects from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.submit_form("#form", :foo, value: "redirect")
+      |> assert_here("pages/show")
+    end
+
+    test "raises when the form does not have phx-submit", %{conn: conn} do
+      assert_raise ArgumentError, fn ->
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.submit_form("#form-without-phx-attrs", :foo, value: "bar")
+      end
+    end
+  end
+
+  describe "update_form" do
+    test "handlers render changes from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> assert_input_value("form", "value-input", nil)
+      |> Pages.update_form("#form", :foo, action: "rerender", value: "bar")
+      |> assert_input_value("form", "value-input", "bar")
+    end
+
+    test "follows navigation from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", :foo, action: "navigate")
+      |> assert_here("live/show")
+    end
+
+    test "follows redirects from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", :foo, action: "redirect")
+      |> assert_here("pages/show")
+    end
+
+    test "raises when the form does not have phx-change", %{conn: conn} do
+      assert_raise ArgumentError, fn ->
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.update_form("#form-without-phx-attrs", :foo, action: "bar")
+      end
+    end
+  end
 end
