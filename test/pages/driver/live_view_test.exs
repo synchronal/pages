@@ -1,54 +1,64 @@
 defmodule Test.Driver.LiveViewTest do
+  # @related [subject](lib/pages/driver/live_view.ex)
   use Test.ConnCase, async: true
-  alias HtmlQuery, as: Hq
 
   test "renders from a live view", %{conn: conn} do
-    page = conn |> Pages.visit("/live")
-    assert page.__struct__ == Pages.Driver.LiveView
-
-    page
-    |> Hq.find!("[test-page-id]")
-    |> Hq.attr("test-page-id")
-    |> assert_eq("live")
+    conn
+    |> Pages.visit("/live")
+    |> assert_success()
+    |> assert_driver(:live_view)
+    |> assert_here("live")
   end
 
-  test "handles redirecting from initial mount to a live view", %{conn: conn} do
-    page = conn |> Pages.visit("/live/redirect?case=initial-live")
-    assert page.__struct__ == Pages.Driver.LiveView
+  describe "mount redirect" do
+    test "handles redirecting from initial mount to a live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/redirect?case=initial-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live")
+    end
 
-    page
-    |> Hq.find!("[test-page-id]")
-    |> Hq.attr("test-page-id")
-    |> assert_eq("live")
+    test "handles redirecting from connected mount to a live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/redirect?case=connected-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live")
+    end
+
+    test "handles redirecting from initial mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/redirect?case=initial-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+
+    test "handles redirecting from connected mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/redirect?case=connected-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
   end
 
-  test "handles redirecting from connected mount to a live view", %{conn: conn} do
-    page = conn |> Pages.visit("/live/redirect?case=connected-live")
-    assert page.__struct__ == Pages.Driver.LiveView
+  describe "mount push_navigate" do
+    test "handles redirecting from initial mount to a live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=initial-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live")
+    end
 
-    page
-    |> Hq.find!("[test-page-id]")
-    |> Hq.attr("test-page-id")
-    |> assert_eq("live")
-  end
-
-  test "handles redirecting from initial mount to a controller", %{conn: conn} do
-    page = conn |> Pages.visit("/live/redirect?case=initial-dead")
-    assert page.__struct__ == Pages.Driver.Conn
-
-    page
-    |> Hq.find!("[test-page-id]")
-    |> Hq.attr("test-page-id")
-    |> assert_eq("pages/show")
-  end
-
-  test "handles redirecting from connected mount to a controller", %{conn: conn} do
-    page = conn |> Pages.visit("/live/redirect?case=connected-dead")
-    assert page.__struct__ == Pages.Driver.Conn
-
-    page
-    |> Hq.find!("[test-page-id]")
-    |> Hq.attr("test-page-id")
-    |> assert_eq("pages/show")
+    test "handles redirecting from connected mount to a live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=connected-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live")
+    end
   end
 end

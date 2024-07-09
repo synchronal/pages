@@ -12,6 +12,7 @@ defmodule Test.ConnCase do
       import Moar.Assertions
       import Phoenix.ConnTest
       import Plug.Conn
+      import Test.Helpers
     end
   end
 
