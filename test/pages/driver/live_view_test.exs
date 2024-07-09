@@ -104,4 +104,34 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_driver(:live_view)
     end
   end
+
+  describe "handle_redirect" do
+    test "waits for a message to be sent to redirect", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/redirect?case=manual")
+      |> assert_here("live/redirect")
+      |> Pages.click(test_role: "trigger-async-redirect")
+      |> assert_here("live/redirect")
+      |> Pages.handle_redirect()
+      |> assert_here("pages/show")
+    end
+  end
+
+  describe "rerender" do
+    defp assert_rerender_content(page, expected) do
+      page
+      |> Hq.find!(test_role: "content")
+      |> Hq.text()
+      |> assert_eq(expected, returning: page)
+    end
+
+    test "updates the rendered content based on async changes in the live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/rerender")
+      |> assert_here("live/rerender")
+      |> assert_rerender_content("0")
+      |> Pages.rerender()
+      |> assert_rerender_content("1")
+    end
+  end
 end
