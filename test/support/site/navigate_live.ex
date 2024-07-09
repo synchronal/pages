@@ -1,5 +1,4 @@
 defmodule Test.Site.NavigateLive do
-  @moduledoc false
   use Test.Site.Web, :live_view
 
   @impl Phoenix.LiveView

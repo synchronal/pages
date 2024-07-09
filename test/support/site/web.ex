@@ -1,6 +1,4 @@
 defmodule Test.Site.Web do
-  @moduledoc false
-
   def live_view(opts) do
     quote do
       use Phoenix.LiveView, unquote(opts)

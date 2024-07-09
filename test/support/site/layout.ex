@@ -1,5 +1,4 @@
 defmodule Test.Site.Layout do
-  @moduledoc false
   use Phoenix.Component
 
   def render("basic.html", assigns) do

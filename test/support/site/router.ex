@@ -1,5 +1,4 @@
 defmodule Test.Site.Router do
-  @moduledoc false
   use Phoenix.Router
   import Phoenix.LiveView.Router
 

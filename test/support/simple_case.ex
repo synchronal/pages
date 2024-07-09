@@ -1,6 +1,6 @@
 defmodule Test.SimpleCase do
   @moduledoc """
-  The simplest test case template
+  The simplest test case template.
   """
 
   use ExUnit.CaseTemplate

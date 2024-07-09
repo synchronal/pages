@@ -1,5 +1,4 @@
 defmodule Test.Site.PageLive do
-  @moduledoc false
   use Test.Site.Web, :live_view
 
   @impl Phoenix.LiveView

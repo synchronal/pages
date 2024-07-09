@@ -1,6 +1,6 @@
 defmodule Test.ConnCase do
   @moduledoc """
-  The simplest test case template
+  Initializes a Plug.Conn for tests.
   """
 
   use ExUnit.CaseTemplate
