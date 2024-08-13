@@ -36,24 +36,16 @@ defmodule Pages.Driver.Conn do
   @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.result()
   @impl Pages.Driver
   def click(page, :get, maybe_title, selector) do
-    link = page |> Hq.find!(selector)
+    link = find_matching_link_elem!(page, maybe_title, selector)
     refute_link_method(link)
-
-    if title = maybe_title do
-      assert_link_text(link, title)
-    end
 
     href = Hq.attr(link, :href)
     Pages.visit(page.conn, href)
   end
 
   def click(page, :post, maybe_title, selector) do
-    link = page |> Hq.find!(selector)
+    link = find_matching_link_elem!(page, maybe_title, selector)
     assert_link_method(link, "post")
-
-    if title = maybe_title do
-      assert_link_text(link, title)
-    end
 
     page.conn
     |> Pages.Shim.__dispatch(:post, Hq.attr(link, :href), %{
@@ -62,6 +54,24 @@ defmodule Pages.Driver.Conn do
     })
     |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
     |> build()
+  end
+
+  defp find_matching_link_elem!(page, maybe_title, selector) do
+    possible_links = page |> Hq.all(selector)
+
+    case {maybe_title, possible_links} do
+      {nil, [solo_link]} ->
+        solo_link
+
+      {expected_title, [solo_link]} ->
+        assert_link_text(solo_link, expected_title)
+        solo_link
+
+      {expected_title, possible_links} ->
+        possible_links
+        |> Enum.filter(&(Hq.text(&1) == expected_title))
+        |> Moar.Enum.first!()
+    end
   end
 
   @impl Pages.Driver
