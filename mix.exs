@@ -47,7 +47,7 @@ defmodule Pages.MixProject do
       {:jason, "~> 1.3", optional: true},
       {:markdown_formatter, "~> 1.0", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
-      {:mix_test_interactive, "~> 2.0", only: :dev, runtime: false},
+      {:mix_test_interactive, "~> 3.0", only: :dev, runtime: false},
       {:moar, "~> 1.10"},
       {:phoenix, "~> 1.6"},
       {:phoenix_live_view, "~> 0.16.4 or ~> 0.17"}
