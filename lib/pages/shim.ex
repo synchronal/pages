@@ -15,7 +15,7 @@ defmodule Pages.Shim do
 
   def __endpoint do
     gestalt_config(:pages, :phoenix_endpoint, self()) ||
-      raise("""
+      raise(Pages.Error, """
       Unable to find configured endpoint.
 
           config :pages, :phoenix_endpoint, My.EndpointModule
@@ -48,7 +48,7 @@ defmodule Pages.Shim do
         |> __retain_connect_params(conn)
 
       true ->
-        raise "This version of #{test_module} does not define #{old_function} or #{new_function}"
+        raise Pages.Error, "This version of #{test_module} does not define #{old_function} or #{new_function}"
     end
   end
 
