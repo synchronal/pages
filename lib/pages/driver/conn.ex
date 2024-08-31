@@ -76,6 +76,20 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
+  def update_form(%__MODULE__{} = page, selector, schema, form_data, _opts \\ []) do
+    with {:ok, form} <- Pages.Form.build(page, selector),
+         {:ok, form} <- Pages.Form.update(form, schema, form_data),
+         {:ok, html} <- Pages.Form.apply(form, page.conn.resp_body) do
+      conn = %{page.conn | resp_body: html}
+
+      %{page | conn: conn}
+    else
+      {:error, reason} ->
+        raise Pages.Error, reason <> "\n\nHTML:\n\n#{Hq.pretty(page)}"
+    end
+  end
+
+  @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
     uri = URI.parse(to_string(path))
 

@@ -28,5 +28,7 @@ defmodule Test.Site.Router do
     live("/live/redirect", Test.Site.RedirectLive)
     live("/live/rerender", Test.Site.RerenderLive)
     get("/pages/show", Test.Site.PageController, :show)
+    get("/pages/form", Test.Site.PageController, :form)
+    post("/pages/form", Test.Site.PageController, :submit)
   end
 end

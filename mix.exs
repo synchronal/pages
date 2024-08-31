@@ -41,6 +41,7 @@ defmodule Pages.MixProject do
     [
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.0", only: [:dev, :test], runtime: false},
+      {:ecto, "> 0.0.0", only: [:test]},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:gestalt, ">= 1.0.0 and < 3.0.0"},
       {:html_query, "~> 1.0"},
@@ -49,6 +50,7 @@ defmodule Pages.MixProject do
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
       {:mix_test_interactive, "~> 3.0", only: :dev, runtime: false},
       {:moar, "~> 1.10"},
+      {:phoenix_ecto, "~> 4.4", only: :test, runtime: false},
       {:phoenix, "~> 1.6"},
       {:phoenix_live_view, "~> 0.16.4 or ~> 0.17"}
     ]
