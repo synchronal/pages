@@ -66,6 +66,16 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
+  def rerender(page) do
+    path =
+      [page.conn.request_path, page.conn.query_string]
+      |> Enum.reject(&is_nil/1)
+      |> Enum.join("?")
+
+    visit(page, path)
+  end
+
+  @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
     uri = URI.parse(to_string(path))
 
