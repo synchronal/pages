@@ -76,6 +76,22 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector) do
+    case Pages.Form.build(page, selector) do
+      {:ok, form} ->
+        {action, params} = Pages.Form.to_post(form)
+
+        page.conn
+        |> Pages.Shim.__dispatch(:post, action, params)
+        |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
+        |> Pages.new()
+
+      {:error, reason} ->
+        error!(page, reason)
+    end
+  end
+
+  @impl Pages.Driver
   def update_form(%__MODULE__{} = page, selector, schema, form_data, _opts \\ []) do
     with {:ok, form} <- Pages.Form.build(page, selector),
          {:ok, form} <- Pages.Form.update(form, schema, form_data),
@@ -84,8 +100,7 @@ defmodule Pages.Driver.Conn do
 
       %{page | conn: conn}
     else
-      {:error, reason} ->
-        raise Pages.Error, reason <> "\n\nHTML:\n\n#{Hq.pretty(page)}"
+      {:error, reason} -> error!(page, reason)
     end
   end
 
@@ -111,6 +126,9 @@ defmodule Pages.Driver.Conn do
   end
 
   # # #
+
+  defp error!(page, msg),
+    do: raise(Pages.Error, msg <> "\n\nHTML:\n\n#{Hq.pretty(page)}")
 
   defp refute_link_method(link) do
     method = link |> Hq.attr("data-method")

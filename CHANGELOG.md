@@ -2,7 +2,7 @@
 
 ## Unreleased changes
 
-- Implement `c:Pages.Driver.update_form/4` for `Pages.Driver.Conn`.
+- Implement `c:Pages.Driver.update_form/4` and `c:Pages.Driver.submit_form/2` for `Pages.Driver.Conn`.
 - Visiting a conn without calling new goes directly to that path without loading `/`.
 
 ## 1.1.0

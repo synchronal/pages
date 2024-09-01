@@ -10,6 +10,29 @@ defmodule Pages.Driver.ConnTest do
     |> assert_here("pages/show")
   end
 
+  describe "submit_form" do
+    test "raises when no form exists", %{conn: conn} do
+      msg = ~r|No form found for selector: #form|
+
+      assert_raise Pages.Error, msg, fn ->
+        conn
+        |> Pages.visit("/pages/show")
+        |> Pages.submit_form("#form")
+      end
+    end
+
+    test "submits existing values on a form", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.submit_form("#form")
+      |> assert_here("pages/show")
+
+      assert_receive {:page_controller, :submit, params}
+      assert Map.keys(params) == ~w[_csrf_token form]
+      assert params["form"] == %{"string_value" => "initial"}
+    end
+  end
+
   describe "update_form" do
     test "raises when no form exists", %{conn: conn} do
       msg = ~r|No form found for selector: #form|

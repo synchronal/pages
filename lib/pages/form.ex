@@ -22,13 +22,7 @@ defmodule Pages.Form do
       else: {:ok, form}
   end
 
-  @spec update(t(), atom(), keyword() | map()) :: {:ok, t()}
-  def update(form, schema, data) do
-    values = %{schema => Moar.Map.deep_atomize_keys(data)}
-    data = form.data |> Moar.Map.deep_merge(values)
-    {:ok, %{form | data: data}}
-  end
-
+  @spec apply(t(), Hq.html()) :: {:ok, binary()}
   def apply(form, html) do
     form_html = form.data |> Enum.reduce(form.form_html, &update_input/2)
 
@@ -48,6 +42,19 @@ defmodule Pages.Form do
       end)
 
     {:ok, Floki.raw_html(html)}
+  end
+
+  @spec to_post(t()) :: {String.t(), map()}
+  def to_post(form) do
+    action = Hq.attr(form.form_html, "action")
+    {action, form.data}
+  end
+
+  @spec update(t(), atom(), keyword() | map()) :: {:ok, t()}
+  def update(form, schema, data) do
+    values = %{schema => Moar.Map.deep_atomize_keys(data)}
+    data = form.data |> Moar.Map.deep_merge(values)
+    {:ok, %{form | data: data}}
   end
 
   # # #
