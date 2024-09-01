@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 1.2.0
+
 - Implement `c:Pages.Driver.update_form/4`, `c:Pages.Driver.submit_form/4`, and `c:Pages.Driver.submit_form/2` for
   `Pages.Driver.Conn`.
 - Implement `c:Pages.Driver.rerender/1` for `Pages.Driver.Conn`.
