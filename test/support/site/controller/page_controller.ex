@@ -15,13 +15,15 @@ defmodule Test.Site.PageController do
 
   def submit(conn, %{"form" => form_params} = params) do
     changeset = changeset(form_params)
-    send(self(), {:page_controller, :submit, params})
 
     case Ecto.Changeset.apply_action(changeset, :insert) do
       {:ok, _} ->
+        send(self(), {:page_controller, :submit, :ok, params})
         redirect(conn, to: ~p"/pages/show")
 
       {:error, changeset} ->
+        send(self(), {:page_controller, :submit, :error, params})
+
         conn
         |> assign(:form, changeset |> to_form(as: :form))
         |> render(:form)

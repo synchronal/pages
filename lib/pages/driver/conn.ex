@@ -92,6 +92,12 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
+    page = update_form(page, selector, schema, attrs)
+    submit_form(page, selector)
+  end
+
+  @impl Pages.Driver
   def update_form(%__MODULE__{} = page, selector, schema, form_data, _opts \\ []) do
     with {:ok, form} <- Pages.Form.build(page, selector),
          {:ok, form} <- Pages.Form.update(form, schema, form_data),

@@ -10,7 +10,7 @@ defmodule Pages.Driver.ConnTest do
     |> assert_here("pages/show")
   end
 
-  describe "submit_form" do
+  describe "submit_form/2" do
     test "raises when no form exists", %{conn: conn} do
       msg = ~r|No form found for selector: #form|
 
@@ -21,15 +21,59 @@ defmodule Pages.Driver.ConnTest do
       end
     end
 
-    test "submits existing values on a form", %{conn: conn} do
+    test "posts and follows redirects", %{conn: conn} do
       conn
       |> Pages.visit("/pages/form")
       |> Pages.submit_form("#form")
       |> assert_here("pages/show")
 
-      assert_receive {:page_controller, :submit, params}
+      assert_receive {:page_controller, :submit, :ok, params}
       assert Map.keys(params) == ~w[_csrf_token form]
       assert params["form"] == %{"string_value" => "initial"}
+    end
+
+    test "handles non-redirect error renders", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.update_form("#form", :form, string_value: "")
+      |> Pages.submit_form("#form")
+      |> assert_here("pages/form")
+
+      assert_receive {:page_controller, :submit, :error, params}
+      assert Map.keys(params) == ~w[_csrf_token form]
+      assert params["form"] == %{"string_value" => ""}
+    end
+  end
+
+  describe "submit_form/4" do
+    test "raises when no form exists", %{conn: conn} do
+      assert_raise Pages.Error, fn ->
+        conn
+        |> Pages.visit("/pages/show")
+        |> Pages.submit_form("#form", :form, value: "bar")
+      end
+    end
+
+    test "posts and follows redirects", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.submit_form("#form", :form, string_value: "updated")
+      |> assert_here("pages/show")
+
+      assert_receive {:page_controller, :submit, :ok, params}
+      assert Map.keys(params) == ~w[_csrf_token form]
+      assert params["form"] == %{"string_value" => "updated"}
+    end
+
+    test "handles non-redirect error renders", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.submit_form("#form", :form, string_value: "")
+      |> assert_here("pages/form")
+
+      assert_receive {:page_controller, :submit, :error, params}
+      assert Map.keys(params) == ~w[_csrf_token form]
+      assert params["form"] == %{"string_value" => ""}
     end
   end
 

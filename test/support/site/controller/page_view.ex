@@ -78,7 +78,7 @@ defmodule Test.Site.PageView do
 
   defp error(assigns) do
     ~H"""
-    <p test-role="error" {@rest}>
+    <p test-role="error">
       <%= render_slot(@inner_block) %>
     </p>
     """
