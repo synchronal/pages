@@ -1,6 +1,10 @@
 defmodule Pages.Form do
   @moduledoc false
 
+  # Form parsing an manipulation for drivers that do not implement change tracking natively,
+  # for instance when using Phoenix.ConnTest. This module takes HTML and applies form field
+  # updates by assigning to the `value` attributes of input fields.
+
   alias HtmlQuery, as: Hq
 
   @type t() :: %__MODULE__{}
