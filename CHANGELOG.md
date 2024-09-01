@@ -4,10 +4,12 @@
 
 - Implement `c:Pages.Driver.update_form/4`, `c:Pages.Driver.submit_form/4`, and `c:Pages.Driver.submit_form/2` for
   `Pages.Driver.Conn`.
-- Visiting a conn without calling new goes directly to that path without loading `/`.
+- Implement `c:Pages.Driver.rerender/1` for `Pages.Driver.Conn`.
+- Visiting a conn without calling new goes directly to that path without first loading `/`.
 
 ## 1.1.0
 
+- Improved detection of navigation between controllers and live views.
 - Allow `Pages.visit/2` to be called with a `Plug.Conn`.
 
 ## 1.0.3
