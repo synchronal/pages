@@ -23,6 +23,7 @@ defmodule Test.Site.PageView do
       <.form id="form" for={@form} action="/pages/form">
         <.input type="text" field={@form[:string_value]} label="String Value" />
         <.input type="select" field={@form[:select_value]} label="Select Value" options={select_value_options()} />
+        <.input type="checkbox" field={@form[:bool_value]} label="Check Value" />
       </.form>
     </main>
     """
@@ -67,6 +68,21 @@ defmodule Test.Site.PageView do
     |> input()
   end
 
+  def input(%{type: "checkbox"} = assigns) do
+    assigns = assign_new(assigns, :checked, fn -> Phoenix.HTML.Form.normalize_value("checkbox", assigns[:value]) end)
+
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <label>
+        <input type="hidden" name={@name} value="false" />
+        <input type="checkbox" id={@id} name={@name} value="true" checked={@checked} {@rest} />
+        <%= @label %>
+      </label>
+      <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
   def input(%{type: "select"} = assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
@@ -75,7 +91,7 @@ defmodule Test.Site.PageView do
         <option value=""><%= @prompt %></option>
         <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
       </select>
-      <.error :for={msg <- @errors} test-field={@name} test-role="form-error"><%= msg %></.error>
+      <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
   end
@@ -92,7 +108,7 @@ defmodule Test.Site.PageView do
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         {@rest}
       />
-      <.error :for={msg <- @errors} test-field={@name} test-role="form-error"><%= msg %></.error>
+      <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
     """
   end

@@ -3,7 +3,7 @@
 ## Unreleased changes
 
 - `update_form/4` on conn behaves like live views, where unreferenced inputs are unset.
-- Conn driver form functions handle select inputs.
+- Conn driver form functions handle select and checkbox inputs.
 
 ## 1.2.0
 

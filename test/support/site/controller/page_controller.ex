@@ -12,10 +12,11 @@ defmodule Test.Site.PageController do
     embedded_schema do
       field(:string_value, :string)
       field(:select_value, Ecto.Enum, values: ~w[initial updated]a)
+      field(:bool_value, :boolean)
     end
 
     @required_attrs ~w[string_value]a
-    @optional_attrs ~w[select_value]a
+    @optional_attrs ~w[bool_value select_value]a
 
     def changeset(params \\ %{}) do
       %__MODULE__{string_value: "initial", select_value: :initial}

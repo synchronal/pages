@@ -29,7 +29,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :ok, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "initial", "select_value" => "initial"}
+      assert params["form"] == %{"string_value" => "initial", "select_value" => "initial", "bool_value" => "false"}
     end
 
     test "handles non-redirect error renders", %{conn: conn} do
@@ -41,7 +41,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :error, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "", "select_value" => ""}
+      assert params["form"] == %{"string_value" => "", "select_value" => "", "bool_value" => "false"}
     end
   end
 
@@ -62,7 +62,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :ok, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "updated", "select_value" => ""}
+      assert params["form"] == %{"string_value" => "updated", "select_value" => "", "bool_value" => "false"}
     end
 
     test "handles non-redirect error renders", %{conn: conn} do
@@ -73,7 +73,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :error, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "", "select_value" => ""}
+      assert params["form"] == %{"string_value" => "", "select_value" => "", "bool_value" => "false"}
     end
   end
 
@@ -118,7 +118,7 @@ defmodule Pages.Driver.ConnTest do
                |> Hq.find("#form")
                |> Hq.form_fields()
 
-      assert form_params == %{select_value: "initial", string_value: "initial"}
+      assert form_params == %{select_value: "initial", string_value: "initial", bool_value: "false"}
 
       page = page |> Pages.update_form("#form", :form, select_value: "updated")
 
@@ -127,7 +127,30 @@ defmodule Pages.Driver.ConnTest do
                |> Hq.find("#form")
                |> Hq.form_fields()
 
-      assert form_params == %{select_value: "updated"}
+      assert form_params == %{select_value: "updated", bool_value: "false"}
+    end
+
+    test "updates checkbox inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{select_value: "initial", string_value: "initial", bool_value: "false"}
+
+      page = page |> Pages.update_form("#form", :form, bool_value: true)
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{select_value: "", bool_value: "true"}
     end
   end
 end
