@@ -28,7 +28,6 @@ defmodule Pages.Form do
 
   @spec merge(t(), keyword() | map()) :: {:ok, t()}
   def merge(form, data) do
-    data = form.data |> Moar.Map.deep_merge(data)
     {:ok, %{form | data: data}}
   end
 
@@ -42,8 +41,6 @@ defmodule Pages.Form do
   def update_html(form, html) do
     form_inputs = flatten_form_data(form.data)
     form_html = update_form_html(form.form_html, form_inputs)
-
-    # form_html = form.data |> Enum.reduce(form.form_html, &update_input/2)
 
     html =
       html
@@ -75,14 +72,14 @@ defmodule Pages.Form do
   defp flatten_form_data(data) do
     data
     |> Enum.reduce(%{}, fn
-      {key, value}, acc when not is_map(value) ->
-        Map.put(acc, to_string(key), value)
-
-      {key, values}, acc ->
+      {key, values}, acc when is_map(values) or is_list(values) ->
         Enum.reduce(values, acc, fn {inner_key, value}, acc ->
           key = Phoenix.HTML.Form.input_name(key, inner_key)
           Map.put(acc, key, value)
         end)
+
+      {key, value}, acc ->
+        Map.put(acc, to_string(key), value)
     end)
   end
 
@@ -110,9 +107,11 @@ defmodule Pages.Form do
     |> Hq.parse()
     |> Floki.traverse_and_update(fn
       {"input", attrs, children} = input ->
-        if List.keyfind(attrs, "type", 0) == {"type", "hidden"},
+        {"type", type} = List.keyfind(attrs, "type", 0)
+
+        if type == "hidden",
           do: input,
-          else: {"input", update_value(attrs, inputs), children}
+          else: {"input", update_value(attrs, type, inputs), children}
 
       {"select", attrs, children} ->
         {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
@@ -153,7 +152,8 @@ defmodule Pages.Form do
     end
   end
 
-  defp update_value(attrs, inputs) do
+  @text_input_types ~w[email number password search tel text textarea url]
+  defp update_value(attrs, type, inputs) when type in @text_input_types do
     {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
     value = Map.get(inputs, name)
 
