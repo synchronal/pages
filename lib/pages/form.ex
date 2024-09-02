@@ -26,8 +26,8 @@ defmodule Pages.Form do
       else: {:ok, form}
   end
 
-  @spec merge(t(), keyword() | map()) :: {:ok, t()}
-  def merge(form, data) do
+  @spec set(t(), keyword() | map()) :: {:ok, t()}
+  def set(form, data) do
     {:ok, %{form | data: data}}
   end
 
