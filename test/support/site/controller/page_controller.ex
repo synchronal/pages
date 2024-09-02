@@ -3,10 +3,34 @@ defmodule Test.Site.PageController do
   use Phoenix.VerifiedRoutes, endpoint: Test.Site.Endpoint, router: Test.Site.Router
   import Phoenix.Component, only: [to_form: 2]
 
-  def show(conn, _params), do: render(conn, :show)
+  # # #
+
+  defmodule Data do
+    use Ecto.Schema
+
+    @primary_key false
+    embedded_schema do
+      field(:string_value, :string)
+      field(:select_value, Ecto.Enum, values: ~w[initial updated]a)
+    end
+
+    @required_attrs ~w[string_value]a
+    @optional_attrs ~w[select_value]a
+
+    def changeset(params \\ %{}) do
+      %__MODULE__{string_value: "initial", select_value: :initial}
+      |> Ecto.Changeset.cast(params, @required_attrs ++ @optional_attrs)
+      |> Ecto.Changeset.validate_required(@required_attrs)
+    end
+  end
+
+  # # # Actions
+
+  def show(conn, _params),
+    do: render(conn, :show)
 
   def form(conn, _params) do
-    data = changeset()
+    data = Data.changeset()
 
     conn
     |> assign(:form, data |> to_form(as: :form))
@@ -14,7 +38,7 @@ defmodule Test.Site.PageController do
   end
 
   def submit(conn, %{"form" => form_params} = params) do
-    changeset = changeset(form_params)
+    changeset = Data.changeset(form_params)
 
     case Ecto.Changeset.apply_action(changeset, :insert) do
       {:ok, _} ->
@@ -28,16 +52,5 @@ defmodule Test.Site.PageController do
         |> assign(:form, changeset |> to_form(as: :form))
         |> render(:form)
     end
-  end
-
-  # # #
-
-  @required_attrs ~w[string_value]a
-  @optional_attrs ~w[]a
-
-  def changeset(params \\ %{}) do
-    {%{string_value: "initial"}, %{string_value: :string}}
-    |> Ecto.Changeset.cast(params, @required_attrs ++ @optional_attrs)
-    |> Ecto.Changeset.validate_required(@required_attrs)
   end
 end

@@ -26,8 +26,20 @@ defmodule Pages.Form do
       else: {:ok, form}
   end
 
-  @spec apply(t(), Hq.html()) :: {:ok, binary()}
-  def apply(form, html) do
+  @spec merge(t(), keyword() | map()) :: {:ok, t()}
+  def merge(form, data) do
+    data = form.data |> Moar.Map.deep_merge(data)
+    {:ok, %{form | data: data}}
+  end
+
+  @spec to_post(t()) :: {String.t(), map()}
+  def to_post(form) do
+    action = Hq.attr(form.form_html, "action")
+    {action, form.data}
+  end
+
+  @spec update_html(t(), Hq.html()) :: {:ok, binary()}
+  def update_html(form, html) do
     form_html = form.data |> Enum.reduce(form.form_html, &update_input/2)
 
     html =
@@ -46,19 +58,6 @@ defmodule Pages.Form do
       end)
 
     {:ok, Floki.raw_html(html)}
-  end
-
-  @spec to_post(t()) :: {String.t(), map()}
-  def to_post(form) do
-    action = Hq.attr(form.form_html, "action")
-    {action, form.data}
-  end
-
-  @spec update(t(), atom(), keyword() | map()) :: {:ok, t()}
-  def update(form, schema, data) do
-    values = %{schema => Moar.Map.deep_atomize_keys(data)}
-    data = form.data |> Moar.Map.deep_merge(values)
-    {:ok, %{form | data: data}}
   end
 
   # # #
@@ -105,9 +104,8 @@ defmodule Pages.Form do
       key = Phoenix.HTML.Form.input_name(key, inner_key)
 
       html
-      |> Floki.find_and_update("input[name='#{key}']", fn
-        {"input", attrs} -> {"input", update_value(attrs, value)}
-      end)
+      |> find_and_update_inputs(key, value)
+      |> find_and_update_selects(key, value)
     end)
   end
 
@@ -116,5 +114,53 @@ defmodule Pages.Form do
       {"value", _} -> {"value", value}
       other -> other
     end)
+  end
+
+  defp find_and_update_inputs(html, key, value) do
+    Floki.find_and_update(html, "input[name='#{key}']", fn
+      {"input", attrs} -> {"input", update_value(attrs, value)}
+    end)
+  end
+
+  defp find_and_update_selects(html, key, value) do
+    Floki.traverse_and_update(html, fn
+      {"select", attrs, children} = select ->
+        if List.keyfind(attrs, "name", 0) == {"name", key} do
+          {"select", attrs, find_and_update_options(children, value)}
+        else
+          select
+        end
+
+      other ->
+        other
+    end)
+  end
+
+  defp find_and_update_options(options, value) do
+    Floki.traverse_and_update(options, fn
+      {"option", attrs, children} ->
+        attrs =
+          attrs
+          |> List.keydelete("selected", 0)
+          |> then(&maybe_select(&1, value, children))
+
+        {"option", attrs, children}
+
+      other ->
+        other
+    end)
+  end
+
+  defp maybe_select(attrs, value, children) do
+    cond do
+      List.keyfind(attrs, "value", 0) == {"value", value} ->
+        [{"selected", "selected"} | attrs]
+
+      Enum.member?(children, value) ->
+        [{"selected", "selected"} | attrs]
+
+      true ->
+        attrs
+    end
   end
 end

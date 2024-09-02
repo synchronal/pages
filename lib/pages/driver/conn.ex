@@ -99,9 +99,11 @@ defmodule Pages.Driver.Conn do
 
   @impl Pages.Driver
   def update_form(%__MODULE__{} = page, selector, schema, form_data, _opts \\ []) do
+    form_data = %{schema => Moar.Map.deep_atomize_keys(form_data)}
+
     with {:ok, form} <- Pages.Form.build(page, selector),
-         {:ok, form} <- Pages.Form.update(form, schema, form_data),
-         {:ok, html} <- Pages.Form.apply(form, page.conn.resp_body) do
+         {:ok, form} <- Pages.Form.merge(form, form_data),
+         {:ok, html} <- Pages.Form.update_html(form, page.conn.resp_body) do
       conn = %{page.conn | resp_body: html}
 
       %{page | conn: conn}

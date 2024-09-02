@@ -29,7 +29,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :ok, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "initial"}
+      assert params["form"] == %{"string_value" => "initial", "select_value" => "initial"}
     end
 
     test "handles non-redirect error renders", %{conn: conn} do
@@ -41,7 +41,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :error, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => ""}
+      assert params["form"] == %{"string_value" => "", "select_value" => "initial"}
     end
   end
 
@@ -62,7 +62,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :ok, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => "updated"}
+      assert params["form"] == %{"string_value" => "updated", "select_value" => "initial"}
     end
 
     test "handles non-redirect error renders", %{conn: conn} do
@@ -73,7 +73,7 @@ defmodule Pages.Driver.ConnTest do
 
       assert_receive {:page_controller, :submit, :error, params}
       assert Map.keys(params) == ~w[_csrf_token form]
-      assert params["form"] == %{"string_value" => ""}
+      assert params["form"] == %{"string_value" => "", "select_value" => "initial"}
     end
   end
 
@@ -88,7 +88,7 @@ defmodule Pages.Driver.ConnTest do
       end
     end
 
-    test "updates a form", %{conn: conn} do
+    test "updates text inputs on a form", %{conn: conn} do
       page =
         conn
         |> Pages.visit("/pages/form")
@@ -102,6 +102,25 @@ defmodule Pages.Driver.ConnTest do
       page = page |> Pages.update_form("#form", :form, string_value: "updated value")
 
       assert %{_csrf_token: _, form: %{string_value: "updated value"}} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+    end
+
+    test "updates select inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: %{select_value: "initial"}} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      page = page |> Pages.update_form("#form", :form, select_value: "updated")
+
+      assert %{_csrf_token: _, form: %{select_value: "updated"}} =
                page
                |> Hq.find("#form")
                |> Hq.form_fields()

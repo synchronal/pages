@@ -2,10 +2,12 @@
 
 ## Unreleased changes
 
+- Conn driver form functions handle select inputs.
+
 ## 1.2.0
 
 - Implement `c:Pages.Driver.update_form/4`, `c:Pages.Driver.submit_form/4`, and `c:Pages.Driver.submit_form/2` for
-  `Pages.Driver.Conn`.
+  `Pages.Driver.Conn` with text inputs.
 - Implement `c:Pages.Driver.rerender/1` for `Pages.Driver.Conn`.
 - Visiting a conn without calling new goes directly to that path without first loading `/`.
 

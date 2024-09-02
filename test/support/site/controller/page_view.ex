@@ -22,6 +22,7 @@ defmodule Test.Site.PageView do
     <main test-page-id="pages/form">
       <.form id="form" for={@form} action="/pages/form">
         <.input type="text" field={@form[:string_value]} label="String Value" />
+        <.input type="select" field={@form[:select_value]} label="Select Value" options={select_value_options()} />
       </.form>
     </main>
     """
@@ -29,11 +30,12 @@ defmodule Test.Site.PageView do
 
   # # #
 
+  defp select_value_options,
+    do: [{"Initial", :initial}, {"Updated", :updated}]
+
+  # # #
+
   attr(:checked, :boolean, doc: "the checked flag for checkbox inputs")
-  attr(:debounce, :boolean, default: true, doc: "when `true`, uses the value of `debounce_ms`")
-  attr(:debounce_ms, :integer, default: 300)
-  attr(:description, :string, default: nil)
-  attr(:direction, :atom, values: [:column, :row], default: :column, doc: "for radio-list")
   attr(:errors, :list, default: [])
   attr(:field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:email]")
   attr(:id, :any, default: nil)
@@ -44,11 +46,16 @@ defmodule Test.Site.PageView do
   attr(:prompt, :string, default: nil, doc: "the prompt for select inputs")
   attr(:required, :boolean, default: false)
 
+  attr(:rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+                  multiple pattern placeholder readonly required rows size step))
+
   attr(:type, :string,
     default: "text",
-    values: ~w[checkbox color date datetime-local email file hidden month number password
-                range radio radio-list search select static tel text textarea time url week]
+    values: ~w(checkbox color date datetime-local email file month number password
+                  range search select tel text textarea time url week)
   )
+
+  attr(:value, :any)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
     assigns
@@ -60,16 +67,30 @@ defmodule Test.Site.PageView do
     |> input()
   end
 
+  def input(%{type: "select"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <.label for={@id} required={@required} value={@label} />
+      <select id={@id} name={@name} multiple={@multiple} {@rest}>
+        <option value=""><%= @prompt %></option>
+        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+      </select>
+      <.error :for={msg <- @errors} test-field={@name} test-role="form-error"><%= msg %></.error>
+    </div>
+    """
+  end
+
   def input(assigns) do
     ~H"""
     <div phx-feedback-for={@name}>
-      <.label description={@description} for={@id} value={@label} />
+      <.label for={@id} value={@label} />
       <input
         id={@id}
         name={@name}
         required={@required}
         type={@type}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
+        {@rest}
       />
       <.error :for={msg <- @errors} test-field={@name} test-role="form-error"><%= msg %></.error>
     </div>
