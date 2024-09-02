@@ -40,7 +40,10 @@ defmodule Pages.Form do
 
   @spec update_html(t(), Hq.html()) :: {:ok, binary()}
   def update_html(form, html) do
-    form_html = form.data |> Enum.reduce(form.form_html, &update_input/2)
+    form_inputs = flatten_form_data(form.data)
+    form_html = update_form_html(form.form_html, form_inputs)
+
+    # form_html = form.data |> Enum.reduce(form.form_html, &update_input/2)
 
     html =
       html
@@ -69,6 +72,20 @@ defmodule Pages.Form do
     end)
   end
 
+  defp flatten_form_data(data) do
+    data
+    |> Enum.reduce(%{}, fn
+      {key, value}, acc when not is_map(value) ->
+        Map.put(acc, to_string(key), value)
+
+      {key, values}, acc ->
+        Enum.reduce(values, acc, fn {inner_key, value}, acc ->
+          key = Phoenix.HTML.Form.input_name(key, inner_key)
+          Map.put(acc, key, value)
+        end)
+    end)
+  end
+
   defp new(html, selector) do
     form = Hq.find(html, selector)
 
@@ -88,48 +105,20 @@ defmodule Pages.Form do
     end
   end
 
-  defp update_input({key, value}, html) when is_binary(value) do
+  defp update_form_html(html, inputs) do
     html
     |> Hq.parse()
-    |> Floki.find_and_update("input[name='#{key}']", fn
-      {"input", attrs} -> {"input", update_value(attrs, value)}
-    end)
-  end
+    |> Floki.traverse_and_update(fn
+      {"input", attrs, children} = input ->
+        if List.keyfind(attrs, "type", 0) == {"type", "hidden"},
+          do: input,
+          else: {"input", update_value(attrs, inputs), children}
 
-  defp update_input({key, values}, html) when is_map(values) do
-    html = html |> Hq.parse()
+      {"select", attrs, children} ->
+        {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
+        value = Map.get(inputs, name)
 
-    values
-    |> Enum.reduce(html, fn {inner_key, value}, html ->
-      key = Phoenix.HTML.Form.input_name(key, inner_key)
-
-      html
-      |> find_and_update_inputs(key, value)
-      |> find_and_update_selects(key, value)
-    end)
-  end
-
-  defp update_value(attrs, value) do
-    Enum.map(attrs, fn
-      {"value", _} -> {"value", value}
-      other -> other
-    end)
-  end
-
-  defp find_and_update_inputs(html, key, value) do
-    Floki.find_and_update(html, "input[name='#{key}']", fn
-      {"input", attrs} -> {"input", update_value(attrs, value)}
-    end)
-  end
-
-  defp find_and_update_selects(html, key, value) do
-    Floki.traverse_and_update(html, fn
-      {"select", attrs, children} = select ->
-        if List.keyfind(attrs, "name", 0) == {"name", key} do
-          {"select", attrs, find_and_update_options(children, value)}
-        else
-          select
-        end
+        {"select", attrs, find_and_update_options(children, value)}
 
       other ->
         other
@@ -162,5 +151,14 @@ defmodule Pages.Form do
       true ->
         attrs
     end
+  end
+
+  defp update_value(attrs, inputs) do
+    {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
+    value = Map.get(inputs, name)
+
+    if value,
+      do: List.keyreplace(attrs, "value", 0, {"value", value}),
+      else: List.keydelete(attrs, "value", 0)
   end
 end
