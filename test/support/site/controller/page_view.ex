@@ -24,6 +24,20 @@ defmodule Test.Site.PageView do
         <.input type="text" field={@form[:string_value]} label="String Value" />
         <.input type="select" field={@form[:select_value]} label="Select Value" options={select_value_options()} />
         <.input type="checkbox" field={@form[:bool_value]} label="Check Value" />
+        <.input
+          type="radio"
+          field={@form[:radio_value]}
+          value="initial"
+          checked={@form[:radio_value].value == :initial}
+          label="Initial"
+        />
+        <.input
+          type="radio"
+          field={@form[:radio_value]}
+          value="updated"
+          checked={@form[:radio_value].value == :updated}
+          label="Updated"
+        />
       </.form>
     </main>
     """
@@ -53,7 +67,7 @@ defmodule Test.Site.PageView do
   attr(:type, :string,
     default: "text",
     values: ~w(checkbox color date datetime-local email file month number password
-                  range search select tel text textarea time url week)
+                  radio range search select tel text textarea time url week)
   )
 
   attr(:value, :any)
@@ -79,6 +93,17 @@ defmodule Test.Site.PageView do
         <%= @label %>
       </label>
       <.error :for={msg <- @errors}><%= msg %></.error>
+    </div>
+    """
+  end
+
+  def input(%{type: "radio"} = assigns) do
+    ~H"""
+    <div phx-feedback-for={@name}>
+      <label>
+        <input type="radio" id={@id} name={@name} value={@value} checked={@checked} {@rest} />
+        <%= @label %>
+      </label>
     </div>
     """
   end

@@ -175,4 +175,18 @@ defmodule Pages.Form do
       true -> List.keydelete(attrs, "checked", 0)
     end
   end
+
+  defp update_value(attrs, "radio", inputs) do
+    {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
+    {"value", field_value} = List.keyfind(attrs, "value", 0)
+
+    checked? = List.keymember?(attrs, "checked", 0)
+    value = Map.get(inputs, name) |> to_string()
+
+    cond do
+      checked? && field_value == value -> attrs
+      field_value == value -> [{"checked", "checked"} | attrs]
+      true -> List.keydelete(attrs, "checked", 0)
+    end
+  end
 end

@@ -10,16 +10,17 @@ defmodule Test.Site.PageController do
 
     @primary_key false
     embedded_schema do
-      field(:string_value, :string)
-      field(:select_value, Ecto.Enum, values: ~w[initial updated]a)
       field(:bool_value, :boolean)
+      field(:radio_value, Ecto.Enum, values: ~w[initial updated]a)
+      field(:select_value, Ecto.Enum, values: ~w[initial updated]a)
+      field(:string_value, :string)
     end
 
     @required_attrs ~w[string_value]a
-    @optional_attrs ~w[bool_value select_value]a
+    @optional_attrs ~w[bool_value radio_value select_value]a
 
     def changeset(params \\ %{}) do
-      %__MODULE__{string_value: "initial", select_value: :initial}
+      %__MODULE__{string_value: "initial", select_value: :initial, radio_value: :initial}
       |> Ecto.Changeset.cast(params, @required_attrs ++ @optional_attrs)
       |> Ecto.Changeset.validate_required(@required_attrs)
     end
