@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 1.3.1
+
 - Correctly follow `navigate` attribute on a component when navigating from live to dead view.
 
 ## 1.3.0
