@@ -236,9 +236,10 @@ defmodule Pages.Driver.LiveView do
       {:error, {:live_redirect, opts}} ->
         endpoint = Pages.Shim.__endpoint()
         {conn, to} = Phoenix.LiveViewTest.__follow_redirect__(page.conn, endpoint, nil, opts)
-        conn = conn |> Pages.Shim.__retain_connect_params(page.conn)
 
-        new(conn, to)
+        conn
+        |> Pages.Shim.__retain_connect_params(page.conn)
+        |> Pages.visit(to)
 
       {:error, {:redirect, %{to: new_path}}} ->
         page.conn

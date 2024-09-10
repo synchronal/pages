@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Correctly follow `navigate` attribute on a component when navigating from live to dead view.
+
 ## 1.3.0
 
 - `update_form/4` on conn behaves like live views, where unreferenced inputs are unset.

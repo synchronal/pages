@@ -88,12 +88,20 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_driver(:live_view)
     end
 
-    test "follows navigations", %{conn: conn} do
+    test "follows push_navigate to live views", %{conn: conn} do
       conn
       |> Pages.visit("/live")
       |> Pages.click(test_role: "navigate-button")
       |> assert_here("live/final")
       |> assert_driver(:live_view)
+    end
+
+    test "navigates to dead views", %{conn: conn} do
+      conn
+      |> Pages.visit("/live")
+      |> Pages.click(test_role: "navigate-dead-link")
+      |> assert_here("pages/show")
+      |> assert_driver(:conn)
     end
 
     test "follows patches", %{conn: conn} do

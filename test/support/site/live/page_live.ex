@@ -18,6 +18,7 @@ defmodule Test.Site.PageLive do
       <button test-role="patch-button" phx-click="patch">Click me to patch</button>
       <button test-role="redirect-dead-button" phx-click="redirect-dead">Click me to redirect to a dead view</button>
       <button test-role="redirect-live-button" phx-click="redirect-live">Click me to redirect to a live view</button>
+      <.link test-role="navigate-dead-link" navigate={~p"/pages/show"}>Click me to navigate directly to a dead view</.link>
     </main>
     """
   end

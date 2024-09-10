@@ -1,7 +1,10 @@
 defmodule Test.Site.Web do
   def live_view(opts) do
+    opts = Keyword.put(opts, :global_prefixes, ~w[test-])
+
     quote do
       use Phoenix.LiveView, unquote(opts)
+      use Phoenix.VerifiedRoutes, endpoint: Test.Site.Endpoint, router: Test.Site.Router
       import Moar.Sugar
     end
   end
