@@ -151,7 +151,7 @@ defmodule Pages do
     do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
 
   @doc """
-  Updates fields in a form with `attributes` without submitting it.
+  Updates fields in a form with `attributes`, without submitting the form.
 
   ## Arguments
 
@@ -159,7 +159,7 @@ defmodule Pages do
   | -------- | ---------- |
   | page     | The current page struct. |
   | selector | A CSS selector matching the form. |
-  | schema   | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
+  | schema   | An optional atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
   | attrs    | A map of attributes to send. |
   | opts     | A keyword list of options. |
 
@@ -175,14 +175,56 @@ defmodule Pages do
   and corresponds to the atom which an `t:Ecto.Changeset.t/0` serializes to, or the value
   of `:as` passed to `Phoenix.HTML.FormData.to_form/4`.
 
+  When a schema is passed, the form attrs will be received as nested params under the schema
+  key.
+
+  If one wishes to construct the full nested map of attrs, then the schema may be omitted.
+
+  ## Examples
+
+  ``` elixir
+  iex> conn = Phoenix.ConnTest.build_conn()
+  iex> page = Pages.visit(conn, "/live/form")
+  iex> Pages.update_form(page, "#form", :my_form, value: "baz")
+
+  iex> conn = Phoenix.ConnTest.build_conn()
+  iex> page = Pages.visit(conn, "/live/form")
+  iex> Pages.update_form(page, "#form", my_form: [value: "baz"])
+  ```
+
   ## Notes
 
   When used with LiveView, this will trigger `phx-change` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), keyword()) :: Pages.result()
-  def update_form(%module{} = page, selector, schema, attrs, opts \\ []),
-    do: module.update_form(page, selector, schema, attrs, opts)
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), schema :: atom(), attrs :: attrs_t(), opts :: keyword()) ::
+          Pages.result()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), schema :: atom(), attrs :: attrs_t()) ::
+          Pages.result()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs :: attrs_t(), opts :: keyword()) ::
+          Pages.result()
+  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs :: attrs_t()) ::
+          Pages.result()
+
+  def update_form(%module{} = page, selector, schema, attrs, opts)
+      when is_atom(schema) and (is_list(attrs) or is_map(attrs)) and is_list(opts) do
+    module.update_form(page, selector, schema, attrs, opts)
+  end
+
+  def update_form(%module{} = page, selector, schema, attrs)
+      when is_atom(schema) and (is_list(attrs) or is_map(attrs)) do
+    module.update_form(page, selector, schema, attrs, [])
+  end
+
+  def update_form(%module{} = page, selector, attrs, opts)
+      when (is_list(attrs) or is_map(attrs)) and is_list(opts) do
+    module.update_form(page, selector, attrs, [])
+  end
+
+  def update_form(%module{} = page, selector, attrs)
+      when is_list(attrs) or is_map(attrs) do
+    module.update_form(page, selector, attrs, [])
+  end
 
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()

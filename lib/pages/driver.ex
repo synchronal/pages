@@ -38,11 +38,42 @@ defmodule Pages.Driver do
   @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
 
   @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/5`."
-  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
+  @callback submit_form(
+              Pages.Driver.t(),
+              Hq.Css.selector(),
+              schema :: atom(),
+              attrs :: Pages.attrs_t(),
+              hidden_attrs :: Pages.attrs_t()
+            ) ::
               Pages.result()
 
-  @doc "Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/4`."
-  @callback update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
+  @doc """
+  Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/5`.
+
+  When updating a form built using `Phoenix.Component.to_form/2` with the `:as` option, one may use
+  the `name` prefix of the form as the `:schema` atom.
+  """
+  @callback update_form(
+              Pages.Driver.t(),
+              Hq.Css.selector(),
+              schema :: atom(),
+              attrs :: Pages.attrs_t(),
+              opts :: Keyword.t()
+            ) :: Pages.result()
+
+  @doc """
+  Fills in a form with the attributes without submitting it. Implementation for `Pages.update_form/4`.
+
+  When interactive with forms backed by multiple changesets, or forms not backed by any changesets,
+  one may choose to pass custon nested maps or keywords matching the structure of the params to be
+  received in a controller or live view.
+  """
+  @callback update_form(
+              Pages.Driver.t(),
+              Hq.Css.selector(),
+              attrs :: Pages.attrs_t(),
+              opts :: Keyword.t()
+            ) :: Pages.result()
 
   @doc "Navigate directly to a page. Implementation for `Pages.visit/2`."
   @callback visit(Pages.Driver.t(), Path.t()) :: Pages.result()
@@ -62,6 +93,7 @@ defmodule Pages.Driver do
     submit_form: 4,
     submit_form: 5,
     update_form: 4,
+    update_form: 5,
     with_child_component: 3
   ]
 end

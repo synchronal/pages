@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- `Pages.update_form` may be called without a schema, by passing `attrs` as a complete nested keyword or map of params.
+
 ## 1.3.1
 
 - Correctly follow `navigate` attribute on a component when navigating from live to dead view.

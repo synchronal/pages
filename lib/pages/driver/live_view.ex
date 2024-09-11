@@ -141,13 +141,19 @@ defmodule Pages.Driver.LiveView do
     |> maybe_trigger_action(params)
   end
 
-  @doc "Called from `Pages.update_form/4` when the given page is a LiveView."
-  @spec update_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), keyword()) ::
-          Pages.result()
+  @doc "Called from `Pages.update_form/5` when the given page is a LiveView."
   @impl Pages.Driver
-  def update_form(%__MODULE__{} = page, selector, schema, attrs, opts \\ []) do
+  def update_form(%__MODULE__{} = page, selector, schema, attrs, opts) do
+    params = %{schema => Map.new(attrs)}
+
+    update_form(page, selector, params, opts)
+  end
+
+  @impl Pages.Driver
+  def update_form(%__MODULE__{} = page, selector, attrs, opts) do
     params =
-      %{schema => Map.new(attrs)}
+      attrs
+      |> Map.new()
       |> then(fn params ->
         case Keyword.get(opts, :target) do
           nil -> params

@@ -101,7 +101,7 @@ defmodule Pages.Driver.ConnTest do
     end
   end
 
-  describe "update_form" do
+  describe "update_form with schema" do
     test "raises when no form exists", %{conn: conn} do
       msg = ~r|No form found for selector: #form|
 
@@ -206,6 +206,121 @@ defmodule Pages.Driver.ConnTest do
              }
 
       page = page |> Pages.update_form("#form", :form, radio_value: "updated")
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{radio_value: "updated", bool_value: "false", select_value: ""}
+    end
+  end
+
+  describe "update_form without schema" do
+    test "raises when no form exists", %{conn: conn} do
+      msg = ~r|No form found for selector: #form|
+
+      assert_raise Pages.Error, msg, fn ->
+        conn
+        |> Pages.visit("/pages/show")
+        |> Pages.update_form("#form", form: [string_value: "something"])
+      end
+    end
+
+    test "updates text inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: %{string_value: "initial"}} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      page = page |> Pages.update_form("#form", form: [string_value: "updated value"])
+
+      assert %{_csrf_token: _, form: %{string_value: "updated value"}} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+    end
+
+    test "updates select inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{
+               select_value: "initial",
+               string_value: "initial",
+               bool_value: "false",
+               radio_value: "initial"
+             }
+
+      page = page |> Pages.update_form("#form", form: [select_value: "updated"])
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{select_value: "updated", bool_value: "false", radio_value: nil}
+    end
+
+    test "updates checkbox inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{
+               select_value: "initial",
+               string_value: "initial",
+               bool_value: "false",
+               radio_value: "initial"
+             }
+
+      page = page |> Pages.update_form("#form", form: [bool_value: true])
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{select_value: "", bool_value: "true", radio_value: nil}
+    end
+
+    test "updates radio inputs on a form", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> assert_success()
+
+      assert %{_csrf_token: _, form: form_params} =
+               page
+               |> Hq.find("#form")
+               |> Hq.form_fields()
+
+      assert form_params == %{
+               select_value: "initial",
+               string_value: "initial",
+               bool_value: "false",
+               radio_value: "initial"
+             }
+
+      page = page |> Pages.update_form("#form", form: [radio_value: "updated"])
 
       assert %{_csrf_token: _, form: form_params} =
                page

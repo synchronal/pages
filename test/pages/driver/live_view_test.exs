@@ -212,7 +212,7 @@ defmodule Test.Driver.LiveViewTest do
     end
   end
 
-  describe "update_form" do
+  describe "update_form with schema" do
     test "handlers render changes from phx-change event handler", %{conn: conn} do
       conn
       |> Pages.visit("/live/form")
@@ -240,6 +240,40 @@ defmodule Test.Driver.LiveViewTest do
         conn
         |> Pages.visit("/live/form")
         |> Pages.update_form("#form-without-phx-attrs", :foo, action: "bar")
+      end
+    end
+  end
+
+  describe "update_form without schema" do
+    test "handlers render changes from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> assert_input_value("form", "value-input", nil)
+      |> Pages.update_form("#form", foo: [action: "rerender", value: "bar"])
+      |> assert_input_value("form", "value-input", "bar")
+      |> Pages.update_form("#form", foo: %{action: "rerender", value: "baz"})
+      |> assert_input_value("form", "value-input", "baz")
+    end
+
+    test "follows navigation from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", foo: [action: "navigate"])
+      |> assert_here("live/show")
+    end
+
+    test "follows redirects from phx-change event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.update_form("#form", foo: [action: "redirect"])
+      |> assert_here("pages/show")
+    end
+
+    test "raises when the form does not have phx-change", %{conn: conn} do
+      assert_raise ArgumentError, fn ->
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.update_form("#form-without-phx-attrs", foo: [action: "bar"])
       end
     end
   end

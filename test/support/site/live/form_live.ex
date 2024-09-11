@@ -57,4 +57,7 @@ defmodule Test.Site.FormLive do
     |> assign(form: to_form(params))
     |> noreply()
   end
+
+  def handle_event("update-form", %{"my_form" => _params}, socket),
+    do: socket |> noreply()
 end

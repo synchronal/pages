@@ -93,13 +93,19 @@ defmodule Pages.Driver.Conn do
 
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
-    page = update_form(page, selector, schema, attrs)
+    page = update_form(page, selector, schema, attrs, [])
     submit_form(page, selector)
   end
 
   @impl Pages.Driver
-  def update_form(%__MODULE__{} = page, selector, schema, form_data, _opts \\ []) do
+  def update_form(%__MODULE__{} = page, selector, schema, form_data, opts) do
     form_data = %{schema => Moar.Map.deep_atomize_keys(form_data)}
+    update_form(page, selector, form_data, opts)
+  end
+
+  @impl Pages.Driver
+  def update_form(%__MODULE__{} = page, selector, form_data, _opts) do
+    form_data = Moar.Map.deep_atomize_keys(form_data)
 
     with {:ok, form} <- Pages.Form.build(page, selector),
          {:ok, form} <- Pages.Form.set(form, form_data),
