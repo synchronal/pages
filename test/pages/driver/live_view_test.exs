@@ -180,7 +180,7 @@ defmodule Test.Driver.LiveViewTest do
     end
   end
 
-  describe "submit_form/4" do
+  describe "submit_form with schema" do
     test "handles render changes from phx-submit event handler", %{conn: conn} do
       conn
       |> Pages.visit("/live/form")
@@ -208,6 +208,38 @@ defmodule Test.Driver.LiveViewTest do
         conn
         |> Pages.visit("/live/form")
         |> Pages.submit_form("#form-without-phx-attrs", :foo, value: "bar")
+      end
+    end
+  end
+
+  describe "submit_form without schema" do
+    test "handles render changes from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> assert_input_value("form", "value-input", nil)
+      |> Pages.submit_form("#form", foo: [value: "rerender"])
+      |> assert_input_value("form", "value-input", "rerendered")
+    end
+
+    test "follows navigation from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.submit_form("#form", foo: [value: "navigate"])
+      |> assert_here("live/show")
+    end
+
+    test "follows redirects from phx-submit event handler", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.submit_form("#form", foo: [value: "redirect"])
+      |> assert_here("pages/show")
+    end
+
+    test "raises when the form does not have phx-submit", %{conn: conn} do
+      assert_raise ArgumentError, fn ->
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.submit_form("#form-without-phx-attrs", foo: [value: "bar"])
       end
     end
   end

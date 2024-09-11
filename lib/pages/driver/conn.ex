@@ -92,7 +92,13 @@ defmodule Pages.Driver.Conn do
   end
 
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, schema, attrs) do
+  def submit_form(%__MODULE__{} = page, selector, attrs, _hidden_attrs) do
+    page = update_form(page, selector, attrs, [])
+    submit_form(page, selector)
+  end
+
+  @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, schema, attrs, _hidden_attrs) do
     page = update_form(page, selector, schema, attrs, [])
     submit_form(page, selector)
   end

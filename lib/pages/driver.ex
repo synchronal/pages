@@ -34,8 +34,14 @@ defmodule Pages.Driver do
   @doc "Submit a form targeted by the given selector. Implementation for `Pages.submit_form/2`."
   @callback submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
 
-  @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/4`."
-  @callback submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
+  @doc "Submit a form targeted by the given selector. Implementation for `Pages.submit_form/3`."
+  @callback submit_form(
+              Pages.Driver.t(),
+              Hq.Css.selector(),
+              attrs :: Pages.attrs_t(),
+              hidden_attrs :: Pages.attrs_t()
+            ) ::
+              Pages.result()
 
   @doc "Fills in a form with the attributes and submits it. Implementation for `Pages.submit_form/5`."
   @callback submit_form(

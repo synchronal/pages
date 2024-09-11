@@ -6,7 +6,7 @@
     "{config,lib,test}/**/*.{ex,exs}",
     "{mix,.formatter,.credo}.exs"
   ],
-  line_length: 120,
+  line_length: 125,
   markdown: [line_length: 120],
   plugins: [Phoenix.LiveView.HTMLFormatter, MarkdownFormatter]
 ]

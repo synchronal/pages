@@ -2,7 +2,13 @@
 
 ## Unreleased changes
 
-- `Pages.update_form` may be called without a schema, by passing `attrs` as a complete nested keyword or map of params.
+- `Pages.update_form` and `Pages.submit_form` may be called without a schema, by passing `attrs` as a complete nested
+  keyword or map of params.
+
+**Breaking changes**:
+
+`c:Pages.Driver.submit_form/4` and `c:Pages.Driver.submit_form/5` will always receive a map or keyword list of
+attributes consisting of hidden fields to modify during submission.
 
 ## 1.3.1
 

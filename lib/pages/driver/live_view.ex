@@ -126,19 +126,25 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Pages.submit_form/4` and `Pages.submit_form/5` when the given page is a LiveView."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t()) :: Pages.result()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Pages.attrs_t()) :: Pages.result()
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
           Pages.result()
+
   @impl Pages.Driver
-  def submit_form(%__MODULE__{} = page, selector, schema, form_attrs, hidden_attrs \\ %{}) do
+  def submit_form(%__MODULE__{} = page, selector, schema, form_attrs, hidden_attrs) do
     params = [{schema, Map.new(form_attrs)}]
     hidden_params = [{schema, Map.new(hidden_attrs)}]
 
+    submit_form(page, selector, params, hidden_params)
+  end
+
+  @impl Pages.Driver
+  def submit_form(%__MODULE__{} = page, selector, form_attrs, hidden_attrs) do
     page.live
-    |> LiveViewTest.form(Hq.Css.selector(selector), params)
-    |> LiveViewTest.render_submit(hidden_params)
+    |> LiveViewTest.form(Hq.Css.selector(selector), form_attrs)
+    |> LiveViewTest.render_submit(Map.new(hidden_attrs))
     |> handle_rendered_result(page)
-    |> maybe_trigger_action(params)
+    |> maybe_trigger_action(form_attrs)
   end
 
   @doc "Called from `Pages.update_form/5` when the given page is a LiveView."

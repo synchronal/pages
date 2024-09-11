@@ -126,7 +126,7 @@ defmodule Pages do
   | ------------ | ---------- |
   | page         | The current page struct. |
   | selector     | A CSS selector matching the form. |
-  | schema       | An atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
+  | schema       | An optional atom representing the schema of the form. Attributes will be nested under this key when submitted. See [Schema](#submit_form/4-schema). |
   | attrs        | A map of attributes to send. |
   | hidden_attrs | An optional map or keyword of hidden values to include. |
 
@@ -136,19 +136,53 @@ defmodule Pages do
   and corresponds to the atom which an `t:Ecto.Changeset.t/0` serializes to, or the value
   of `:as` passed to `Phoenix.HTML.FormData.to_form/4`.
 
+  When a schema is passed, the form attrs will be received as nested params under the schema
+  key.
+
+  If one wishes to construct the full nested map of attrs, then the schema may be omitted.
+
+  ## Examples
+
+  ``` elixir
+  iex> conn = Phoenix.ConnTest.build_conn()
+  iex> page = Pages.visit(conn, "/live/form")
+  iex> Pages.submit_form(page, "#form", :foo, value: "rerender")
+
+  iex> conn = Phoenix.ConnTest.build_conn()
+  iex> page = Pages.visit(conn, "/live/form")
+  iex> Pages.submit_form(page, "#form", foo: [value: "rerender"])
+
+  ```
+
   ## Notes
 
   When used with LiveView, this will trigger `phx-submit` with the specified attributes,
   and handles `phx-trigger-action` if present.
   """
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, attrs),
-    do: module.submit_form(page, selector, schema, attrs)
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), attrs :: attrs_t()) ::
+          Pages.result()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), attrs :: attrs_t(), hidden_attrs :: attrs_t()) ::
+          Pages.result()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), schema :: atom(), attrs :: attrs_t()) ::
+          Pages.result()
+  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), schema :: atom(), attrs :: attrs_t(), hidden_attrs :: attrs_t()) ::
+          Pages.result()
 
-  @doc "See `Pages.submit_form/4` for more information."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), attrs_t(), attrs_t()) :: Pages.result()
-  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs),
-    do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
+  def submit_form(%module{} = page, selector, attrs)
+      when is_list(attrs) or is_map(attrs),
+      do: module.submit_form(page, selector, attrs, [])
+
+  def submit_form(%module{} = page, selector, attrs, hidden_attrs)
+      when is_list(attrs) or (is_map(attrs) and (is_list(hidden_attrs) or is_map(hidden_attrs))),
+      do: module.submit_form(page, selector, attrs, hidden_attrs)
+
+  def submit_form(%module{} = page, selector, schema, attrs)
+      when is_atom(schema) and (is_list(attrs) or is_map(attrs)),
+      do: module.submit_form(page, selector, schema, attrs, [])
+
+  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs)
+      when is_atom(schema) and (is_list(form_attrs) or is_map(form_attrs)),
+      do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
 
   @doc """
   Updates fields in a form with `attributes`, without submitting the form.
@@ -190,6 +224,7 @@ defmodule Pages do
   iex> conn = Phoenix.ConnTest.build_conn()
   iex> page = Pages.visit(conn, "/live/form")
   iex> Pages.update_form(page, "#form", my_form: [value: "baz"])
+
   ```
 
   ## Notes
