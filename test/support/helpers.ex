@@ -24,27 +24,31 @@ defmodule Test.Helpers do
   def assert_success(%Pages.Driver.Conn{conn: %{status: 200}} = page), do: page
   def assert_success(%Pages.Driver.LiveView{} = page), do: page
 
-  def setup_tracer(ctx) do
-    if ctx[:trace] do
-      Code.ensure_loaded!(Pages)
-      Code.ensure_loaded!(Pages.Driver)
-      Code.ensure_loaded!(Pages.Driver.Conn)
-      Code.ensure_loaded!(Pages.Driver.LiveView)
+  if Test.Versions.otp() |> Version.compare("27.0.0") == :lt do
+    def setup_tracer(_ctx), do: :ok
+  else
+    def setup_tracer(ctx) do
+      if ctx[:trace] do
+        Code.ensure_loaded!(Pages)
+        Code.ensure_loaded!(Pages.Driver)
+        Code.ensure_loaded!(Pages.Driver.Conn)
+        Code.ensure_loaded!(Pages.Driver.LiveView)
 
-      {:ok, tracer} = Tracer.start()
+        {:ok, tracer} = Tracer.start()
 
-      session = :trace.session_create(:my_session, tracer, [])
-      :trace.process(session, self(), true, [:call])
-      :trace.function(session, {Pages, :_, :_}, true, [:local])
-      :trace.function(session, {Pages.Driver.Conn, :_, :_}, true, [:local])
-      :trace.function(session, {Pages.Driver.LiveView, :_, :_}, true, [:local])
+        session = :trace.session_create(:my_session, tracer, [])
+        :trace.process(session, self(), true, [:call])
+        :trace.function(session, {Pages, :_, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :_, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.LiveView, :_, :_}, true, [:local])
 
-      on_exit fn ->
-        Tracer.pop_trace(tracer) |> dbg()
-        Tracer.stop(tracer)
+        on_exit(fn ->
+          Tracer.pop_trace(tracer) |> dbg()
+          Tracer.stop(tracer)
+        end)
       end
-    end
 
-    :ok
+      :ok
+    end
   end
 end
