@@ -1,5 +1,12 @@
 defmodule Test.Versions do
   def otp do
+    full_otp_version()
+    |> String.split(".")
+    |> Enum.take(3)
+    |> Enum.join(".")
+  end
+
+  defp full_otp_version do
     major = :erlang.system_info(:otp_release) |> List.to_string()
     vsn_file = Path.join([:code.root_dir(), "releases", major, "OTP_VERSION"])
 
