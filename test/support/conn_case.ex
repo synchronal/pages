@@ -13,6 +13,8 @@ defmodule Test.ConnCase do
       import Phoenix.ConnTest
       import Plug.Conn
       import Test.Helpers
+
+      setup [:setup_tracer]
     end
   end
 

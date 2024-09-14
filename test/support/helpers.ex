@@ -1,6 +1,8 @@
 defmodule Test.Helpers do
-  alias HtmlQuery, as: Hq
+  import ExUnit.Callbacks
   import Moar.Assertions
+
+  alias HtmlQuery, as: Hq
 
   def assert_driver(%Pages.Driver.Conn{} = page, :conn), do: page
   def assert_driver(%Pages.Driver.LiveView{} = page, :live_view), do: page
@@ -21,4 +23,28 @@ defmodule Test.Helpers do
 
   def assert_success(%Pages.Driver.Conn{conn: %{status: 200}} = page), do: page
   def assert_success(%Pages.Driver.LiveView{} = page), do: page
+
+  def setup_tracer(ctx) do
+    if ctx[:trace] do
+      Code.ensure_loaded!(Pages)
+      Code.ensure_loaded!(Pages.Driver)
+      Code.ensure_loaded!(Pages.Driver.Conn)
+      Code.ensure_loaded!(Pages.Driver.LiveView)
+
+      {:ok, tracer} = Tracer.start()
+
+      session = :trace.session_create(:my_session, tracer, [])
+      :trace.process(session, self(), true, [:call])
+      :trace.function(session, {Pages, :_, :_}, true, [:local])
+      :trace.function(session, {Pages.Driver.Conn, :_, :_}, true, [:local])
+      :trace.function(session, {Pages.Driver.LiveView, :_, :_}, true, [:local])
+
+      on_exit fn ->
+        Tracer.pop_trace(tracer) |> dbg()
+        Tracer.stop(tracer)
+      end
+    end
+
+    :ok
+  end
 end
