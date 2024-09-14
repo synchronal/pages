@@ -1,8 +1,8 @@
 defmodule Test.Helpers do
-  import ExUnit.Callbacks
   import Moar.Assertions
 
   alias HtmlQuery, as: Hq
+  require ExUnit.Callbacks
 
   def assert_driver(%Pages.Driver.Conn{} = page, :conn), do: page
   def assert_driver(%Pages.Driver.LiveView{} = page, :live_view), do: page
@@ -42,7 +42,7 @@ defmodule Test.Helpers do
         :trace.function(session, {Pages.Driver.Conn, :_, :_}, true, [:local])
         :trace.function(session, {Pages.Driver.LiveView, :_, :_}, true, [:local])
 
-        on_exit(fn ->
+        ExUnit.Callbacks.on_exit(fn ->
           Tracer.pop_trace(tracer) |> dbg()
           Tracer.stop(tracer)
         end)
