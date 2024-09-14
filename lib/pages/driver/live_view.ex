@@ -19,21 +19,25 @@ defmodule Pages.Driver.LiveView do
           rendered: binary() | nil
         }
 
-  def new(%Plug.Conn{} = conn),
+  @impl Pages.Driver
+  def match?(%Plug.Conn{assigns: %{live_module: _}}), do: true
+  def match?(_), do: false
+
+  @impl Pages.Driver
+  def new(%Plug.Conn{assigns: %{live_module: _}} = conn),
     do: new(conn, conn.request_path, conn.query_params)
 
-  def new(conn, request_path, params \\ %{})
+  def new(_), do: :error
 
-  def new(%Plug.Conn{} = conn, request_path, params) when is_binary(request_path) do
-    new_live(conn, request_path, params)
-    |> handle_rendered_result(%__MODULE__{conn: conn})
+  defp new(%Plug.Conn{} = conn, request_path, params) when is_binary(request_path) do
+    {:ok,
+     new_live(conn, request_path, params)
+     |> handle_rendered_result(%__MODULE__{conn: conn})}
   end
 
   # # #
 
   @doc "Called from `Pages.click/4` when the given page is a LiveView."
-  @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) ::
-          Pages.result()
   @impl Pages.Driver
   def click(%__MODULE__{} = page, :get, maybe_title, selector) do
     page.live
@@ -46,7 +50,6 @@ defmodule Pages.Driver.LiveView do
     do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
   @doc "Called from `Pages.handle_redirect/1` when the given page is a LiveView."
-  @spec handle_redirect(Pages.Driver.t()) :: Pages.Driver.t()
   @impl Pages.Driver
   def handle_redirect(page) do
     {path, _flash} = page.live |> Phoenix.LiveViewTest.assert_redirect()
@@ -58,13 +61,11 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
-  @spec rerender(Pages.Driver.t()) :: Pages.result()
   @impl Pages.Driver
   def rerender(page),
     do: %{page | rendered: LiveViewTest.render(page.live)}
 
   @doc "Called from `Pages.render_change/3` when the given page is a LiveView."
-  @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
   @impl Pages.Driver
   def render_change(%__MODULE__{} = page, selector, value) do
     page.live
@@ -74,7 +75,6 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Pages.render_hook/3` when the given page is a LiveView."
-  @spec render_hook(Pages.Driver.t(), binary(), Pages.attrs_t(), keyword()) :: Pages.result()
   @impl Pages.Driver
   def render_hook(%__MODULE__{} = page, event, value_attrs, options) do
     case Keyword.get(options, :target) do
@@ -86,7 +86,6 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Pages.render_upload/4` when the given page is a LiveView."
-  @spec render_upload(Pages.Driver.t(), Pages.live_view_upload(), binary(), integer()) :: Pages.result()
   @impl Pages.Driver
   def render_upload(%__MODULE__{} = page, %Phoenix.LiveViewTest.Upload{} = upload, entry_name, percent) do
     upload
@@ -111,12 +110,10 @@ defmodule Pages.Driver.LiveView do
 
   This is not implemented in `Pages` due to its specificity to LiveView and LiveViewTest.
   """
-  @spec live_redirect(Pages.Driver.t(), binary()) :: Pages.result()
   def live_redirect(page, destination_path),
     do: page.live |> Phoenix.LiveViewTest.live_redirect(to: destination_path) |> handle_rendered_result(page)
 
   @doc "Called from `Pages.submit_form/2` when the given page is a LiveView."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector) do
     page.live
@@ -126,10 +123,6 @@ defmodule Pages.Driver.LiveView do
   end
 
   @doc "Called from `Pages.submit_form/4` and `Pages.submit_form/5` when the given page is a LiveView."
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), Pages.attrs_t(), Pages.attrs_t()) :: Pages.result()
-  @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), atom(), Pages.attrs_t(), Pages.attrs_t()) ::
-          Pages.result()
-
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector, schema, form_attrs, hidden_attrs) do
     params = [{schema, Map.new(form_attrs)}]
@@ -180,13 +173,13 @@ defmodule Pages.Driver.LiveView do
   This is called from `Pages.visit/2` when the conn indicates that the pages is a LiveView,
   and should only be called directly if the parent function does not work for some reason.
   """
-  @spec visit(Pages.Driver.t(), binary()) :: Pages.result()
   @impl Pages.Driver
   def visit(%__MODULE__{} = page, path) do
     uri = URI.parse(to_string(path))
 
     if uri.host in [nil, "localhost"] do
       new_live(page.conn, path, %{})
+      |> dbg()
       |> handle_rendered_result(page)
     else
       {:error, :external, path}

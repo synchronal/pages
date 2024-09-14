@@ -16,6 +16,7 @@ defmodule Pages do
   """
 
   alias HtmlQuery, as: Hq
+  alias Pages.Driver
 
   @typedoc """
   In most cases, when interacting with pages, a new page will be returned (either a
@@ -32,25 +33,48 @@ defmodule Pages do
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t()) :: Pages.result()
-  def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-  def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
+
+  def new(%Driver{} = driver), do: driver
+
+  def new(session) do
+    drivers = Application.get_env(:pages, :drivers)
+
+    driver =
+      drivers
+      |> Stream.filter(& &1.match?(session))
+      |> Enum.reduce_while(nil, fn driver, _ ->
+        case driver.new(session) do
+          %Driver{} = driver -> {:halt, driver}
+          {:ok, state} -> {:halt, Driver.new(driver, state)}
+          :error -> {:cont, nil}
+        end
+      end)
+
+    driver || raise(Pages.Error, "No driver matches for #{inspect(session)}")
+  end
 
   @doc """
   Simulates clicking on an element at `selector` with title `title`.
   Set the `method` param to `:post` to click on a link that has `data-method=post`.
   """
   @spec click(Pages.Driver.t(), http_method(), text_filter(), Hq.Css.selector()) :: Pages.result()
-  def click(%module{} = page, method, title, selector), do: module.click(page, method, title, selector)
+  def click(%Driver{driver: module, state: state} = driver, method, title, selector),
+    do: module.click(state, method, title, selector) |> merge(driver)
 
   @spec click(Pages.Driver.t(), http_method(), Hq.Css.selector()) :: Pages.result()
-  def click(%module{} = page, :get, selector), do: module.click(page, :get, nil, selector)
-  def click(%module{} = page, :post, selector), do: module.click(page, :post, nil, selector)
+  def click(%Driver{driver: module, state: state} = driver, :get, selector),
+    do: module.click(state, :get, nil, selector) |> merge(driver)
+
+  def click(%Driver{driver: module, state: state} = driver, :post, selector),
+    do: module.click(state, :post, nil, selector) |> merge(driver)
 
   @spec click(Pages.Driver.t(), text_filter(), Hq.Css.selector()) :: Pages.result()
-  def click(%module{} = page, title, selector), do: module.click(page, :get, title, selector)
+  def click(%Driver{driver: module, state: state} = driver, title, selector),
+    do: module.click(state, :get, title, selector) |> merge(driver)
 
   @spec click(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-  def click(%module{} = page, selector), do: module.click(page, :get, nil, selector)
+  def click(%Driver{driver: module, state: state} = driver, selector),
+    do: module.click(state, :get, nil, selector) |> merge(driver)
 
   @doc "Clears out any params set via `Phoenix.LiveViewTest.put_connect_params/2`"
   @spec clear_connect_params(Pages.Driver.t()) :: Pages.result()
@@ -64,22 +88,23 @@ defmodule Pages do
   user. This may be used to handle redirects issued from `c:Phoenix.LiveView.handle_info/2` callbacks, for instance.
   """
   @spec handle_redirect(Pages.Driver.t()) :: Pages.result()
-  def handle_redirect(%module{} = page), do: module.handle_redirect(page)
+  def handle_redirect(%Driver{driver: module, state: state} = driver), do: module.handle_redirect(state) |> merge(driver)
 
   @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
   a description of the `value` field.
   """
   @spec render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
-  def render_change(%module{} = page, selector, value), do: module.render_change(page, selector, value)
+  def render_change(%Driver{driver: module, state: state} = driver, selector, value),
+    do: module.render_change(state, selector, value) |> merge(driver)
 
   @doc """
   Performs an upload of a file input and renders the result. See `Phoenix.LiveViewTest.file_input/4` for
   a description of the `upload` field.
   """
   @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.result()
-  def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
-    do: module.render_upload(page, upload, entry_name, percent)
+  def render_upload(%Driver{driver: module, state: state}, upload, entry_name, percent \\ 100),
+    do: module.render_upload(state, upload, entry_name, percent)
 
   @doc """
   Sends a hook event to the live view.
@@ -102,19 +127,20 @@ defmodule Pages do
   See `Phoenix.LiveViewTest.render_hook/3` for more information.
   """
   @spec render_hook(Pages.Driver.t(), binary(), attrs_t(), keyword()) :: Pages.result()
-  def render_hook(%module{} = page, event, value_attrs, opts \\ []),
-    do: module.render_hook(page, event, value_attrs, opts)
+  def render_hook(%Driver{driver: module, state: state}, event, value_attrs, opts \\ []),
+    do: module.render_hook(state, event, value_attrs, opts)
 
   @doc "Re-renders the page."
   @spec rerender(Pages.Driver.t()) :: Pages.result()
-  def rerender(%module{} = page), do: module.rerender(page)
+  def rerender(%Driver{driver: module, state: state} = driver), do: module.rerender(state) |> merge(driver)
 
   @doc """
   Submits a form without specifying any attributes. This function will submit any values
   currently set in the form HTML.
   """
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector()) :: Pages.result()
-  def submit_form(%module{} = page, selector), do: module.submit_form(page, selector)
+  def submit_form(%Driver{driver: module, state: state} = driver, selector),
+    do: module.submit_form(state, selector) |> merge(driver)
 
   @doc """
   Fills in a form with `attributes` and submits it. Hidden parameters can by send by including
@@ -168,21 +194,21 @@ defmodule Pages do
   @spec submit_form(Pages.Driver.t(), Hq.Css.selector(), schema :: atom(), attrs :: attrs_t(), hidden_attrs :: attrs_t()) ::
           Pages.result()
 
-  def submit_form(%module{} = page, selector, attrs)
+  def submit_form(%Driver{driver: module, state: state} = driver, selector, attrs)
       when is_list(attrs) or is_map(attrs),
-      do: module.submit_form(page, selector, attrs, [])
+      do: module.submit_form(state, selector, attrs, []) |> merge(driver)
 
-  def submit_form(%module{} = page, selector, attrs, hidden_attrs)
+  def submit_form(%Driver{driver: module, state: state} = driver, selector, attrs, hidden_attrs)
       when is_list(attrs) or (is_map(attrs) and (is_list(hidden_attrs) or is_map(hidden_attrs))),
-      do: module.submit_form(page, selector, attrs, hidden_attrs)
+      do: module.submit_form(state, selector, attrs, hidden_attrs) |> merge(driver)
 
-  def submit_form(%module{} = page, selector, schema, attrs)
+  def submit_form(%Driver{driver: module, state: state} = driver, selector, schema, attrs)
       when is_atom(schema) and (is_list(attrs) or is_map(attrs)),
-      do: module.submit_form(page, selector, schema, attrs, [])
+      do: module.submit_form(state, selector, schema, attrs, []) |> merge(driver)
 
-  def submit_form(%module{} = page, selector, schema, form_attrs, hidden_attrs)
+  def submit_form(%Driver{driver: module, state: state} = driver, selector, schema, form_attrs, hidden_attrs)
       when is_atom(schema) and (is_list(form_attrs) or is_map(form_attrs)),
-      do: module.submit_form(page, selector, schema, form_attrs, hidden_attrs)
+      do: module.submit_form(state, selector, schema, form_attrs, hidden_attrs) |> merge(driver)
 
   @doc """
   Updates fields in a form with `attributes`, without submitting the form.
@@ -241,31 +267,35 @@ defmodule Pages do
   @spec update_form(Pages.Driver.t(), Hq.Css.selector(), attrs :: attrs_t()) ::
           Pages.result()
 
-  def update_form(%module{} = page, selector, schema, attrs, opts)
+  def update_form(%Driver{driver: module, state: state} = driver, selector, schema, attrs, opts)
       when is_atom(schema) and (is_list(attrs) or is_map(attrs)) and is_list(opts) do
-    module.update_form(page, selector, schema, attrs, opts)
+    module.update_form(state, selector, schema, attrs, opts) |> merge(driver)
   end
 
-  def update_form(%module{} = page, selector, schema, attrs)
+  def update_form(%Driver{driver: module, state: state} = driver, selector, schema, attrs)
       when is_atom(schema) and (is_list(attrs) or is_map(attrs)) do
-    module.update_form(page, selector, schema, attrs, [])
+    module.update_form(state, selector, schema, attrs, []) |> merge(driver)
   end
 
-  def update_form(%module{} = page, selector, attrs, opts)
+  def update_form(%Driver{driver: module, state: state} = driver, selector, attrs, opts)
       when (is_list(attrs) or is_map(attrs)) and is_list(opts) do
-    module.update_form(page, selector, attrs, [])
+    module.update_form(state, selector, attrs, []) |> merge(driver)
   end
 
-  def update_form(%module{} = page, selector, attrs)
+  def update_form(%Driver{driver: module, state: state} = driver, selector, attrs)
       when is_list(attrs) or is_map(attrs) do
-    module.update_form(page, selector, attrs, [])
+    module.update_form(state, selector, attrs, []) |> merge(driver)
   end
 
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  @spec visit(Plug.Conn.t(), Path.t()) :: Pages.result()
-  def visit(%Plug.Conn{} = conn, path), do: %{conn | request_path: path} |> Pages.new()
-  def visit(%module{} = page, path), do: module.visit(page, path)
+  @spec visit(term(), Path.t()) :: Pages.result()
+  def visit(%Plug.Conn{state: :unset} = conn, path), do: %{conn | request_path: path} |> Pages.new() |> flatten()
+
+  def visit(%Pages.Driver{driver: module, state: state} = driver, path),
+    do: module.visit(state, path) |> dbg() |> merge(driver)
+
+  def visit(other, path), do: other |> Pages.new() |> dbg() |> visit(path) |> flatten()
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given
@@ -284,5 +314,14 @@ defmodule Pages do
   ```
   """
   @spec with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) :: Pages.Driver.t()
-  def with_child_component(%module{} = page, child_id, fun), do: module.with_child_component(page, child_id, fun)
+  def with_child_component(%Driver{driver: module, state: state}, child_id, fun),
+    do: module.with_child_component(state, child_id, fun)
+
+  # # #
+
+  defp merge(%Driver{} = state, _driver), do: state |> flatten()
+  defp merge(state, driver), do: %{driver | state: state} |> flatten()
+
+  defp flatten(%Driver{state: %Driver{} = state}), do: state |> flatten()
+  defp flatten(other), do: other
 end

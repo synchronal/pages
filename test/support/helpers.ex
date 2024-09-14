@@ -1,11 +1,24 @@
 defmodule Test.Helpers do
+  import ExUnit.Assertions
   import Moar.Assertions
 
   alias HtmlQuery, as: Hq
+  alias Pages.Driver.Conn
+  alias Pages.Driver.LiveView
   require ExUnit.Callbacks
 
-  def assert_driver(%Pages.Driver.Conn{} = page, :conn), do: page
-  def assert_driver(%Pages.Driver.LiveView{} = page, :live_view), do: page
+  def assert_driver(%Pages.Driver{driver: Conn} = page, :conn), do: page
+  def assert_driver(%Pages.Driver{driver: LiveView} = page, :live_view), do: page
+
+  def assert_driver(page, expected) do
+    flunk("""
+    Expected driver to be a #{inspect(expected)}
+
+    Found:
+
+    #{inspect(page)}
+    """)
+  end
 
   def assert_here(page, page_id),
     do:
@@ -21,8 +34,18 @@ defmodule Test.Helpers do
     |> assert_eq(expected, returning: page)
   end
 
-  def assert_success(%Pages.Driver.Conn{conn: %{status: 200}} = page), do: page
-  def assert_success(%Pages.Driver.LiveView{} = page), do: page
+  def assert_success(%Pages.Driver{driver: Conn, state: %{conn: %{status: 200}}} = page), do: page
+  def assert_success(%Pages.Driver{driver: LiveView} = page), do: page
+
+  def assert_success(page) do
+    flunk("""
+    Expected page to successfully load!
+
+    Found:
+
+    #{inspect(page)}
+    """)
+  end
 
   if Test.Versions.otp() |> Version.compare("27.0.0") == :lt do
     def setup_tracer(_ctx), do: :ok
@@ -38,9 +61,16 @@ defmodule Test.Helpers do
 
         session = :trace.session_create(:my_session, tracer, [])
         :trace.process(session, self(), true, [:call])
-        :trace.function(session, {Pages, :_, :_}, true, [:local])
-        :trace.function(session, {Pages.Driver.Conn, :_, :_}, true, [:local])
-        :trace.function(session, {Pages.Driver.LiveView, :_, :_}, true, [:local])
+        :trace.function(session, {Pages, :click, :_}, true, [:local])
+        :trace.function(session, {Pages, :new, :_}, true, [:local])
+        :trace.function(session, {Pages, :submit_form, :_}, true, [:local])
+        :trace.function(session, {Pages, :update_form, :_}, true, [:local])
+        :trace.function(session, {Pages, :visit, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :click, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :new, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :submit_form, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :update_form, :_}, true, [:local])
+        :trace.function(session, {Pages.Driver.Conn, :visit, :_}, true, [:local])
 
         ExUnit.Callbacks.on_exit(fn ->
           Tracer.pop_trace(tracer) |> dbg()

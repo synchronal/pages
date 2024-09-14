@@ -15,6 +15,14 @@ defmodule Pages.Driver.Conn do
           conn: Plug.Conn.t()
         }
 
+  @impl Pages.Driver
+  def match?(%Plug.Conn{assigns: %{live_module: _}}), do: false
+  def match?(%Plug.Conn{}), do: true
+  def match?(_), do: false
+
+  @impl Pages.Driver
+  def new(%Plug.Conn{assigns: %{live_module: _}}), do: :error
+
   def new(%Plug.Conn{state: :unset} = conn) do
     conn
     |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
@@ -22,17 +30,22 @@ defmodule Pages.Driver.Conn do
   end
 
   def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
-    redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
-    __struct__(conn: conn) |> visit(redirect)
+    redirect_to = Phoenix.ConnTest.redirected_to(conn, status_code)
+
+    conn
+    |> Phoenix.ConnTest.ensure_recycled()
+    |> Pages.Shim.__dispatch(:get, redirect_to)
+    |> Pages.new()
   end
 
   def new(%Plug.Conn{} = conn),
-    do: __struct__(conn: conn)
+    do: {:ok, __struct__(conn: conn)}
+
+  def new(_), do: :error
 
   # # #
 
   @doc "Simulates clicking on an element at `selector` with title `title`."
-  @spec click(Pages.Driver.t(), Pages.http_method(), Pages.text_filter() | nil, Hq.Css.selector()) :: Pages.result()
   @impl Pages.Driver
   def click(page, :get, maybe_title, selector) do
     link = page |> Hq.find!(selector)
@@ -83,7 +96,6 @@ defmodule Pages.Driver.Conn do
 
         page.conn
         |> Pages.Shim.__dispatch(:post, action, params)
-        |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
         |> Pages.new()
 
       {:error, reason} ->
@@ -94,13 +106,13 @@ defmodule Pages.Driver.Conn do
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector, attrs, _hidden_attrs) do
     page = update_form(page, selector, attrs, [])
-    submit_form(page, selector)
+    Pages.submit_form(page, selector)
   end
 
   @impl Pages.Driver
   def submit_form(%__MODULE__{} = page, selector, schema, attrs, _hidden_attrs) do
     page = update_form(page, selector, schema, attrs, [])
-    submit_form(page, selector)
+    Pages.submit_form(page, selector)
   end
 
   @impl Pages.Driver
@@ -117,8 +129,7 @@ defmodule Pages.Driver.Conn do
          {:ok, form} <- Pages.Form.set(form, form_data),
          {:ok, html} <- Pages.Form.update_html(form, page.conn.resp_body) do
       conn = %{page.conn | resp_body: html}
-
-      %{page | conn: conn}
+      Pages.new(conn)
     else
       {:error, reason} -> error!(page, reason)
     end
@@ -129,10 +140,12 @@ defmodule Pages.Driver.Conn do
     uri = URI.parse(to_string(path))
 
     if uri.host in [nil, "localhost"] do
-      page.conn
-      |> Pages.Shim.__dispatch(:get, path)
-      |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-      |> Pages.new()
+      conn =
+        page.conn
+        |> Pages.Shim.__dispatch(:get, path)
+        |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
+
+      %{page | conn: conn}
     else
       {:error, :external, path}
     end
