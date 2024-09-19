@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 2.0.0
+
 - Fix case where new live view redirects back through a conn to another live view.
 - `Pages.update_form` and `Pages.submit_form` may be called without a schema, by passing `attrs` as a complete nested
   keyword or map of params.
@@ -9,7 +11,8 @@
 **Breaking changes**:
 
 `c:Pages.Driver.submit_form/4` and `c:Pages.Driver.submit_form/5` will always receive a map or keyword list of
-attributes consisting of hidden fields to modify during submission.
+attributes consisting of hidden fields to modify during submission. If one is only using `Pages` top-level functions,
+this should be safe—only calls directly to driver modules should be affected.
 
 ## 1.3.1
 
