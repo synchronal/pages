@@ -225,8 +225,6 @@ defmodule Pages.Driver.LiveView do
 
           conn ->
             conn
-            |> Phoenix.ConnTest.ensure_recycled()
-            |> Pages.new()
         end)
 
       is_nil(path) ->
@@ -261,6 +259,9 @@ defmodule Pages.Driver.LiveView do
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}
+
+      %Plug.Conn{} = conn ->
+        Pages.new(conn)
     end
   end
 

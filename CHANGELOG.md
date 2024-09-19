@@ -2,6 +2,7 @@
 
 ## Unreleased changes
 
+- Fix case where new live view redirects back through a conn to another live view.
 - `Pages.update_form` and `Pages.submit_form` may be called without a schema, by passing `attrs` as a complete nested
   keyword or map of params.
 
