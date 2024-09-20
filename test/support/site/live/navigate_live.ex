@@ -27,4 +27,58 @@ defmodule Test.Site.NavigateLive do
       |> ok()
     end
   end
+
+  def mount(%{"case" => "initial-dead"}, _session, socket) do
+    socket
+    |> push_navigate(to: "/pages/show")
+    |> ok()
+  end
+
+  def mount(%{"case" => "connected-dead"}, _session, socket) do
+    if connected?(socket) do
+      socket
+      |> push_navigate(to: "/pages/show")
+      |> ok()
+    else
+      socket
+      |> ok()
+    end
+  end
+
+  def mount(%{"case" => "handle-params"}, _session, socket),
+    do: socket |> ok()
+
+  @impl Phoenix.LiveView
+  def handle_params(%{"do" => "initial-live"}, _url, socket),
+    do: socket |> push_navigate(to: "/live") |> noreply()
+
+  def handle_params(%{"do" => "connected-live"}, _url, socket) do
+    if connected?(socket) do
+      socket
+      |> push_navigate(to: "/live")
+      |> noreply()
+    else
+      socket
+      |> noreply()
+    end
+  end
+
+  def handle_params(%{"do" => "initial-dead"}, _url, socket),
+    do: socket |> push_navigate(to: "/pages/show") |> noreply()
+
+  def handle_params(%{"do" => "connected-dead"}, _url, socket) do
+    if connected?(socket) do
+      socket
+      |> push_navigate(to: "/pages/show")
+      |> noreply()
+    else
+      socket
+      |> noreply()
+    end
+  end
+
+  def handle_params(%{"case" => "initial-live"}, _url, socket), do: socket |> noreply()
+  def handle_params(%{"case" => "connected-live"}, _url, socket), do: socket |> noreply()
+  def handle_params(%{"case" => "initial-dead"}, _url, socket), do: socket |> noreply()
+  def handle_params(%{"case" => "connected-dead"}, _url, socket), do: socket |> noreply()
 end

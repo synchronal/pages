@@ -61,6 +61,56 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_driver(:live_view)
       |> assert_here("live/show")
     end
+
+    test "handles navigating from initial mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=initial-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+
+    test "handles navigating from connected mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=connected-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+  end
+
+  describe "handle_params push_navigate" do
+    test "handles navigating from initial mount", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=handle-params&do=initial-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live/show")
+    end
+
+    test "handles navigating from connected mount", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=handle-params&do=connected-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live/show")
+    end
+
+    test "handles navigating from initial mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=handle-params&do=initial-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+
+    test "handles navigating from connected mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/navigate?case=handle-params&do=connected-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
   end
 
   describe "click" do
