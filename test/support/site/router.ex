@@ -25,6 +25,7 @@ defmodule Test.Site.Router do
     live("/live/form", Test.Site.FormLive)
     live("/live/final", Test.Site.PageLive, :final)
     live("/live/navigate", Test.Site.NavigateLive)
+    live("/live/patch", Test.Site.PatchLive)
     live("/live/patch/:case", Test.Site.PatchLive)
     live("/live/redirect", Test.Site.RedirectLive)
     live("/live/rerender", Test.Site.RerenderLive)

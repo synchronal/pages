@@ -217,10 +217,10 @@ defmodule Pages.Driver.LiveView do
         conn
         |> Phoenix.ConnTest.ensure_recycled()
         |> Pages.Shim.__dispatch(:get, path, params)
+        |> Pages.Shim.__retain_connect_params(conn)
         |> then(fn
           %{assigns: %{live_module: _}} = new_conn ->
             new_conn
-            |> Pages.Shim.__retain_connect_params(conn)
             |> Phoenix.LiveViewTest.__live__(path)
 
           conn ->
