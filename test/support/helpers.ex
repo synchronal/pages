@@ -1,4 +1,5 @@
 defmodule Test.Helpers do
+  import ExUnit.Assertions
   import Moar.Assertions
 
   alias HtmlQuery, as: Hq
@@ -6,6 +7,16 @@ defmodule Test.Helpers do
 
   def assert_driver(%Pages.Driver.Conn{} = page, :conn), do: page
   def assert_driver(%Pages.Driver.LiveView{} = page, :live_view), do: page
+
+  def assert_driver(page, expected) do
+    flunk("""
+    Expected driver to be a #{inspect(expected)}
+
+    Found:
+
+    #{inspect(page)}
+    """)
+  end
 
   def assert_here(page, page_id),
     do:
@@ -23,6 +34,16 @@ defmodule Test.Helpers do
 
   def assert_success(%Pages.Driver.Conn{conn: %{status: 200}} = page), do: page
   def assert_success(%Pages.Driver.LiveView{} = page), do: page
+
+  def assert_success(page) do
+    flunk("""
+    Expected page to successfully load!
+
+    Found:
+
+    #{inspect(page)}
+    """)
+  end
 
   if Test.Versions.otp() |> Version.compare("27.0.0") == :lt do
     def setup_tracer(_ctx), do: :ok
