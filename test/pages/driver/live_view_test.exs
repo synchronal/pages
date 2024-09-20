@@ -113,6 +113,40 @@ defmodule Test.Driver.LiveViewTest do
     end
   end
 
+  describe "handle_params push_patch" do
+    test "handles patching from initial mount", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/patch?case=handle-params&do=initial-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live/show")
+    end
+
+    test "handles patching from connected mount", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/patch?case=handle-params&do=connected-live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live/patch")
+    end
+
+    test "handles patching from initial mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/patch?case=handle-params&do=initial-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+
+    test "handles patching from connected mount to a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/patch?case=handle-params&do=initial-dead")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+  end
+
   describe "click" do
     test "handles updates to views", %{conn: conn} do
       page = conn |> Pages.visit("/live")
