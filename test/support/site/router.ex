@@ -21,14 +21,18 @@ defmodule Test.Site.Router do
   scope "/" do
     pipe_through(:browser)
 
-    live("/live", Test.Site.PageLive)
-    live("/live/form", Test.Site.FormLive)
+    live_session :pages do
+      live("/live", Test.Site.PageLive)
+      live("/live/show/:case", Test.Site.PageLive)
+      live("/live/form", Test.Site.FormLive)
+      live("/live/navigate", Test.Site.NavigateLive)
+      live("/live/patch", Test.Site.PatchLive)
+      live("/live/patch/:case", Test.Site.PatchLive)
+      live("/live/redirect", Test.Site.RedirectLive)
+      live("/live/rerender", Test.Site.RerenderLive)
+    end
+
     live("/live/final", Test.Site.PageLive, :final)
-    live("/live/navigate", Test.Site.NavigateLive)
-    live("/live/patch", Test.Site.PatchLive)
-    live("/live/patch/:case", Test.Site.PatchLive)
-    live("/live/redirect", Test.Site.RedirectLive)
-    live("/live/rerender", Test.Site.RerenderLive)
     get("/pages/show", Test.Site.PageController, :show)
     get("/pages/form", Test.Site.PageController, :form)
     post("/pages/form", Test.Site.PageController, :submit)

@@ -238,6 +238,23 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_driver(:conn)
     end
 
+    test "patches to live views", %{conn: conn} do
+      conn
+      |> Pages.visit("/live")
+      |> Pages.click(test_role: "patch-live-link")
+      |> assert_here("live/show/link")
+      |> assert_driver(:live_view)
+    end
+
+    @tag :skip
+    test "patches to dead views", %{conn: conn} do
+      conn
+      |> Pages.visit("/live")
+      |> Pages.click(test_role: "patch-dead-link")
+      |> assert_here("pages/show")
+      |> assert_driver(:conn)
+    end
+
     test "follows patches", %{conn: conn} do
       conn
       |> Pages.visit("/live")
