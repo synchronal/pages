@@ -3,6 +3,10 @@ defmodule Test.Versions do
     full_otp_version()
     |> String.split(".")
     |> Enum.take(3)
+    |> then(fn
+      [a, b] -> [a, b, "0"]
+      versions -> versions
+    end)
     |> Enum.join(".")
   end
 
