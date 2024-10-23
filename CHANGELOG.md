@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add a "context" map to the drivers to store whatever information test authors find useful.
+
 ## 2.0.0
 
 - Fix case where new live view redirects back through a conn to another live view.

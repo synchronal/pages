@@ -64,7 +64,6 @@ email_addresses =
 assert email_addresses == ["alice@example.com", "alice@example.net"]
 ```
 
-
 ## Optional: Taming Complexity With The Page Object Pattern
 
 In a large web application, test complexity becomes an issue. One way to solve web test complexity is by using
@@ -123,6 +122,20 @@ end
 A page module that you define can work with either a controller-based page or a LiveView-based page, and a test can
 test workflows that use both controllers and LiveViews.
 
+### The Context
+
+If you have information you'd like to keep while stepping through multiple pages, you can assign it to the
+context from functions like `Pages.new` and `Pages.visit`:
+
+```elixir
+page =
+  conn
+  |> Pages.visit("/live/form", some_key: "some_value")
+  |> Pages.update_form("#form", foo: [action: "redirect"])
+  |> assert_here("pages/show")
+
+assert page.context == %{some_key: "some_value"}
+```
 
 ## Installation
 
