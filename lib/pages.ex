@@ -25,15 +25,16 @@ defmodule Pages do
   @type result() :: Pages.Driver.t() | {:error, :external, Path.t()}
 
   @type attrs_t() :: Keyword.t() | map()
+  @type context_t() :: %{atom() => any()} | keyword()
   @type page_type_t() :: :live_view
   @type http_method() :: :get | :post
   @type live_view_upload() :: %Phoenix.LiveViewTest.Upload{}
   @type text_filter() :: binary() | Regex.t()
 
   @doc "Instantiates a new page."
-  @spec new(Plug.Conn.t()) :: Pages.result()
-  def new(%Plug.Conn{assigns: %{live_module: _}} = conn), do: Pages.Driver.LiveView.new(conn)
-  def new(%Plug.Conn{} = conn), do: Pages.Driver.Conn.new(conn)
+  @spec new(Plug.Conn.t(), context_t()) :: Pages.result()
+  def new(%Plug.Conn{assigns: %{live_module: _}} = conn, context), do: Pages.Driver.LiveView.new(conn, context)
+  def new(%Plug.Conn{} = conn, context), do: Pages.Driver.Conn.new(conn, context)
 
   @doc """
   Simulates clicking on an element at `selector` with title `title`.
@@ -262,10 +263,11 @@ defmodule Pages do
   end
 
   @doc "Visits `path`."
-  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  @spec visit(Plug.Conn.t(), Path.t()) :: Pages.result()
-  def visit(%Plug.Conn{} = conn, path), do: %{conn | request_path: path} |> Pages.new()
-  def visit(%module{} = page, path), do: module.visit(page, path)
+  @spec visit(Pages.Driver.t(), Path.t(), context_t()) :: Pages.result()
+  @spec visit(Plug.Conn.t(), Path.t(), context_t()) :: Pages.result()
+  def visit(conn_or_page, path, context \\ %{})
+  def visit(%Plug.Conn{} = conn, path, context), do: %{conn | request_path: path} |> Pages.new(context)
+  def visit(%module{} = page, path, context), do: module.visit(page, path, context)
 
   @doc """
   Finds a phoenix component with an id matching `child_id`, and passes it to the given

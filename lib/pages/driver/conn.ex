@@ -9,25 +9,29 @@ defmodule Pages.Driver.Conn do
 
   alias HtmlQuery, as: Hq
 
-  defstruct ~w[conn]a
+  defstruct conn: nil,
+            context: %{}
 
   @type t() :: %__MODULE__{
-          conn: Plug.Conn.t()
+          conn: Plug.Conn.t(),
+          context: %{atom() => any()}
         }
 
-  def new(%Plug.Conn{state: :unset} = conn) do
+  def new(conn, context \\ %{})
+
+  def new(%Plug.Conn{state: :unset} = conn, context) do
     conn
     |> Pages.Shim.__dispatch(:get, conn.request_path, conn.path_params)
-    |> Pages.new()
+    |> Pages.new(context)
   end
 
-  def new(%Plug.Conn{status: status_code} = conn) when status_code in [301, 302] do
+  def new(%Plug.Conn{status: status_code} = conn, context) when status_code in [301, 302] do
     redirect = Phoenix.ConnTest.redirected_to(conn, status_code)
-    __struct__(conn: conn) |> visit(redirect)
+    __struct__(conn: conn, context: Map.new(context)) |> visit(redirect)
   end
 
-  def new(%Plug.Conn{} = conn),
-    do: __struct__(conn: conn)
+  def new(%Plug.Conn{} = conn, context),
+    do: __struct__(conn: conn, context: Map.new(context))
 
   # # #
 
@@ -45,7 +49,7 @@ defmodule Pages.Driver.Conn do
     page.conn
     |> Pages.Shim.__dispatch(:get, Hq.attr(link, :href))
     |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    |> Pages.new(page.context)
   end
 
   def click(page, :post, maybe_title, selector) do
@@ -62,7 +66,7 @@ defmodule Pages.Driver.Conn do
       "_method" => "post"
     })
     |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-    |> Pages.new()
+    |> Pages.new(page.context)
   end
 
   @impl Pages.Driver
@@ -84,7 +88,7 @@ defmodule Pages.Driver.Conn do
         page.conn
         |> Pages.Shim.__dispatch(:post, action, params)
         |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-        |> Pages.new()
+        |> Pages.new(page.context)
 
       {:error, reason} ->
         error!(page, reason)
@@ -132,7 +136,7 @@ defmodule Pages.Driver.Conn do
       page.conn
       |> Pages.Shim.__dispatch(:get, path)
       |> then(&Pages.Shim.__retain_connect_params(&1, page.conn))
-      |> Pages.new()
+      |> Pages.new(page.context)
     else
       {:error, :external, path}
     end
