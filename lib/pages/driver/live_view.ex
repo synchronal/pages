@@ -11,22 +11,26 @@ defmodule Pages.Driver.LiveView do
   alias HtmlQuery, as: Hq
   alias Phoenix.LiveViewTest
 
-  defstruct ~w[conn live rendered]a
+  defstruct conn: nil,
+            context: %{},
+            live: nil,
+            rendered: nil
 
   @type t() :: %__MODULE__{
           conn: Plug.Conn.t(),
+          context: %{atom() => any()},
           live: any(),
           rendered: binary() | nil
         }
 
-  def new(%Plug.Conn{} = conn),
-    do: new(conn, conn.request_path, conn.query_params)
+  def new(%Plug.Conn{} = conn, context),
+    do: new(conn, context, conn.request_path, conn.query_params)
 
-  def new(conn, request_path, params \\ %{})
+  def new(conn, context, request_path, params \\ %{})
 
-  def new(%Plug.Conn{} = conn, request_path, params) when is_binary(request_path) do
+  def new(%Plug.Conn{} = conn, context, request_path, params) when is_binary(request_path) do
     new_live(conn, request_path, params)
-    |> handle_rendered_result(%__MODULE__{conn: conn})
+    |> handle_rendered_result(%__MODULE__{conn: conn, context: Map.new(context)})
   end
 
   # # #
@@ -54,7 +58,7 @@ defmodule Pages.Driver.LiveView do
     page.conn
     |> Phoenix.ConnTest.ensure_recycled()
     |> Pages.Shim.__retain_connect_params(page.conn)
-    |> Pages.visit(path)
+    |> Pages.visit(path, page.context)
   end
 
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
@@ -249,19 +253,19 @@ defmodule Pages.Driver.LiveView do
 
         conn
         |> Pages.Shim.__retain_connect_params(page.conn)
-        |> Pages.visit(to)
+        |> Pages.visit(to, page.context)
 
       {:error, {:redirect, %{to: new_path}}} ->
         page.conn
         |> Phoenix.ConnTest.ensure_recycled()
         |> Pages.Shim.__retain_connect_params(page.conn)
-        |> Pages.visit(new_path)
+        |> Pages.visit(new_path, page.context)
 
       {:ok, live, html} ->
         %{page | live: live, rendered: html}
 
       %Plug.Conn{} = conn ->
-        Pages.new(conn)
+        Pages.new(conn, page.context)
     end
   end
 
@@ -271,7 +275,7 @@ defmodule Pages.Driver.LiveView do
         page.live
         |> Phoenix.LiveViewTest.form("form[phx-trigger-action]", params)
         |> Pages.Shim.__follow_trigger_action(page.conn)
-        |> Pages.new()
+        |> Pages.new(page.context)
 
       _ ->
         page

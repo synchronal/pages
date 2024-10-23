@@ -494,4 +494,16 @@ defmodule Test.Driver.LiveViewTest do
       end
     end
   end
+
+  describe "preserves context on the driver" do
+    test "when following a redirect", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/live/form", hawak: "cool")
+        |> Pages.update_form("#form", foo: [action: "redirect"])
+        |> assert_here("pages/show")
+
+      assert_eq(page.context, %{hawak: "cool"})
+    end
+  end
 end
