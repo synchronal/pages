@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 2.1.0
+
 - Add a "context" map to the drivers to store whatever information test authors find useful.
 
 ## 2.0.0
