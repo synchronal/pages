@@ -266,11 +266,11 @@ defmodule Pages do
   @doc "Visits `path`."
   @spec visit(Pages.Driver.t(), Path.t(), context_t()) :: Pages.result()
   @spec visit(Plug.Conn.t(), Path.t(), context_t()) :: Pages.result()
-
-  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
-  @spec visit(Plug.Conn.t(), Path.t(), context_t()) :: Pages.result()
   def visit(%Plug.Conn{} = conn, path, context), do: %{conn | request_path: path} |> Pages.new(context)
   def visit(%module{} = page, path, context), do: module.visit(%{page | context: context}, path)
+
+  @spec visit(Pages.Driver.t(), Path.t()) :: Pages.result()
+  @spec visit(Plug.Conn.t(), Path.t()) :: Pages.result()
 
   def visit(%Plug.Conn{} = conn, path), do: %{conn | request_path: path} |> Pages.new(%{})
   def visit(%module{} = page, path), do: module.visit(page, path)
