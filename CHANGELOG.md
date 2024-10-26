@@ -2,6 +2,11 @@
 
 ## Unreleased changes
 
+## 2.1.1
+
+- Add default context to `Pages.new` to avoid breaking change to API.
+- Fix ability to call `Pages.visit` on an existing page.
+
 ## 2.1.0
 
 - Add a "context" map to the drivers to store whatever information test authors find useful.
