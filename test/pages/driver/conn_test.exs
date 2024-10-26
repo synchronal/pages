@@ -2,12 +2,22 @@ defmodule Pages.Driver.ConnTest do
   use Test.ConnCase, async: true
   alias HtmlQuery, as: Hq
 
-  test "gets from a controller", %{conn: conn} do
-    conn
-    |> Pages.visit("/pages/show")
-    |> assert_success()
-    |> assert_driver(:conn)
-    |> assert_here("pages/show")
+  describe "visit" do
+    test "gets from a controller", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/show")
+      |> assert_success()
+      |> assert_driver(:conn)
+      |> assert_here("pages/show")
+    end
+
+    test "may be visited multiple times", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/show")
+      |> Pages.visit("/pages/show")
+      |> assert_success()
+      |> Pages.visit("/pages/show")
+    end
   end
 
   describe "submit_form/2" do
