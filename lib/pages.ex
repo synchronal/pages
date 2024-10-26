@@ -33,6 +33,7 @@ defmodule Pages do
 
   @doc "Instantiates a new page."
   @spec new(Plug.Conn.t(), context_t()) :: Pages.result()
+  def new(conn, context \\ %{})
   def new(%Plug.Conn{assigns: %{live_module: _}} = conn, context), do: Pages.Driver.LiveView.new(conn, context)
   def new(%Plug.Conn{} = conn, context), do: Pages.Driver.Conn.new(conn, context)
 
