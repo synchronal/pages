@@ -3,12 +3,22 @@ defmodule Test.Driver.LiveViewTest do
   use Test.ConnCase, async: true
   alias HtmlQuery, as: Hq
 
-  test "renders from a live view", %{conn: conn} do
-    conn
-    |> Pages.visit("/live")
-    |> assert_success()
-    |> assert_driver(:live_view)
-    |> assert_here("live/show")
+  describe "visit" do
+    test "renders from a live view", %{conn: conn} do
+      conn
+      |> Pages.visit("/live")
+      |> assert_success()
+      |> assert_driver(:live_view)
+      |> assert_here("live/show")
+    end
+
+    test "may be visited multiple times", %{conn: conn} do
+      conn
+      |> Pages.visit("/live")
+      |> Pages.visit("/live")
+      |> assert_success()
+      |> Pages.visit("/live")
+    end
   end
 
   describe "mount redirect" do
