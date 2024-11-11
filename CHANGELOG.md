@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Implement `c:Pages.Driver.open_browser/1` for `Pages.Driver.LiveView`.
+
 ## 2.1.1
 
 - Add default context to `Pages.new` to avoid breaking change to API.

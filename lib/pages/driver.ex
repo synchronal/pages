@@ -19,6 +19,9 @@ defmodule Pages.Driver do
   @doc "Wait for a server-issued redirect. Implementation for `Pages.handle_redirect/1`."
   @callback handle_redirect(Pages.Driver.t()) :: Pages.result()
 
+  @doc "Attempt to open the current page in a web browser."
+  @callback open_browser(Pages.Driver.t()) :: Pages.Driver.t()
+
   @doc "Render a change. Implementation for `Pages.render_change/3`."
   @callback render_change(Pages.Driver.t(), Hq.Css.selector(), Enum.t()) :: Pages.result()
 

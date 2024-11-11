@@ -61,6 +61,16 @@ defmodule Pages.Driver.LiveView do
     |> Pages.visit(path, page.context)
   end
 
+  @doc """
+  Attempt to open the current page in a web browser.
+  """
+  @spec open_browser(Pages.Driver.t()) :: Pages.Driver.t()
+  @impl Pages.Driver
+  def open_browser(page) do
+    LiveViewTest.open_browser(page.live)
+    page
+  end
+
   @doc "Called from `Pages.rerender/1` when the given page is a LiveView."
   @spec rerender(Pages.Driver.t()) :: Pages.result()
   @impl Pages.Driver

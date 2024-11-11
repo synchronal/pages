@@ -69,6 +69,12 @@ defmodule Pages do
   def handle_redirect(%module{} = page), do: module.handle_redirect(page)
 
   @doc """
+  Attempt to open the current page in a web browser.
+  """
+  @spec open_browser(Pages.Driver.t()) :: Pages.Driver.t()
+  def open_browser(%module{} = page), do: module.open_browser(page)
+
+  @doc """
   Render a change to the element at `selector` with the value `value`. See `Phoenix.LiveViewTest.render_change/2` for
   a description of the `value` field.
   """

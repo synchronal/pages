@@ -69,6 +69,14 @@ defmodule Pages.Driver.Conn do
     |> Pages.new(page.context)
   end
 
+  @doc """
+  Not yet implemented for this driver.
+  """
+  @impl Pages.Driver
+  @spec open_browser(Pages.Driver.t()) :: Pages.Driver.t()
+  def open_browser(_page),
+    do: raise("Not yet implemented for this driver")
+
   @impl Pages.Driver
   def rerender(page) do
     path =
