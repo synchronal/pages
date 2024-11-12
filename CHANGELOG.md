@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 2.2.0
+
 - Implement `c:Pages.Driver.open_browser/1` for `Pages.Driver.LiveView`.
 
 ## 2.1.1
