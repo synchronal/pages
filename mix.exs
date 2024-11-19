@@ -44,7 +44,7 @@ defmodule Pages.MixProject do
       {:ecto, "> 0.0.0", only: [:test]},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false},
       {:gestalt, ">= 1.0.0 and < 3.0.0"},
-      {:html_query, "~> 2.0.0"},
+      {:html_query, "> 2.0.0"},
       {:jason, "~> 1.3", optional: true},
       {:markdown_formatter, "~> 1.0", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},

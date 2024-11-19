@@ -2,6 +2,9 @@
 
 ## Unreleased changes
 
+- Relax version of `HtmlQuery` to anything greater than `2.0.0`. Note that depending on the version of `HtmlQuery`, the
+  output of forms may be different.
+
 ## 2.2.0
 
 - Implement `c:Pages.Driver.open_browser/1` for `Pages.Driver.LiveView`.
