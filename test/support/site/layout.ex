@@ -5,7 +5,7 @@ defmodule Test.Site.Layout do
     ~H"""
     <html lang="en">
       <body>
-        <%= @inner_content %>
+        {@inner_content}
       </body>
     </html>
     """

@@ -30,6 +30,7 @@ defmodule Test.Site.Router do
       live("/live/patch/:case", Test.Site.PatchLive)
       live("/live/redirect", Test.Site.RedirectLive)
       live("/live/rerender", Test.Site.RerenderLive)
+      live("/live/patched/:patched", Test.Site.PageLive)
     end
 
     live("/live/final", Test.Site.PageLive, :final)

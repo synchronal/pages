@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 2.3.0
+
+- Relax version of `Phoenix.LiveView` to allow usage with `1.0.0`.
+
 ## 2.2.1
 
 - Relax version of `HtmlQuery` to anything greater than `2.0.0`. Note that depending on the version of `HtmlQuery`, the

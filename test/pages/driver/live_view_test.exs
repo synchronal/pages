@@ -286,7 +286,7 @@ defmodule Test.Driver.LiveViewTest do
       conn
       |> Pages.visit("/live")
       |> Pages.click(test_role: "patch-live-link")
-      |> assert_here("live/show/link")
+      |> assert_here("live/show/patch")
       |> assert_driver(:live_view)
     end
 
@@ -303,7 +303,7 @@ defmodule Test.Driver.LiveViewTest do
       conn
       |> Pages.visit("/live")
       |> Pages.click(test_role: "patch-button")
-      |> assert_here("live/final")
+      |> assert_here("live/show/patch-handler")
       |> assert_driver(:live_view)
     end
   end

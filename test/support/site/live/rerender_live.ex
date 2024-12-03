@@ -5,7 +5,7 @@ defmodule Test.Site.RerenderLive do
   def render(assigns) do
     ~H"""
     <main test-page-id="live/rerender">
-      <span test-role="content"><%= @content %></span>
+      <span test-role="content">{@content}</span>
     </main>
     """
   end

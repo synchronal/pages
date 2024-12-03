@@ -90,9 +90,9 @@ defmodule Test.Site.PageView do
       <label>
         <input type="hidden" name={@name} value="false" />
         <input type="checkbox" id={@id} name={@name} value="true" checked={@checked} {@rest} />
-        <%= @label %>
+        {@label}
       </label>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -102,7 +102,7 @@ defmodule Test.Site.PageView do
     <div phx-feedback-for={@name}>
       <label>
         <input type="radio" id={@id} name={@name} value={@value} checked={@checked} {@rest} />
-        <%= @label %>
+        {@label}
       </label>
     </div>
     """
@@ -113,10 +113,10 @@ defmodule Test.Site.PageView do
     <div phx-feedback-for={@name}>
       <.label for={@id} required={@required} value={@label} />
       <select id={@id} name={@name} multiple={@multiple} {@rest}>
-        <option value=""><%= @prompt %></option>
-        <%= Phoenix.HTML.Form.options_for_select(@options, @value) %>
+        <option value="">{@prompt}</option>
+        {Phoenix.HTML.Form.options_for_select(@options, @value)}
       </select>
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -133,7 +133,7 @@ defmodule Test.Site.PageView do
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         {@rest}
       />
-      <.error :for={msg <- @errors}><%= msg %></.error>
+      <.error :for={msg <- @errors}>{msg}</.error>
     </div>
     """
   end
@@ -141,14 +141,14 @@ defmodule Test.Site.PageView do
   defp error(assigns) do
     ~H"""
     <p test-role="error">
-      <%= render_slot(@inner_block) %>
+      {render_slot(@inner_block)}
     </p>
     """
   end
 
   defp label(assigns) do
     ~H"""
-    <label for={@for}><%= @value %></label>
+    <label for={@for}>{@value}</label>
     """
   end
 

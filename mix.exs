@@ -51,8 +51,8 @@ defmodule Pages.MixProject do
       {:mix_test_interactive, "~> 3.0", only: :dev, runtime: false},
       {:moar, "~> 1.10"},
       {:phoenix_ecto, "~> 4.4", only: :test, runtime: false},
-      {:phoenix, "~> 1.6"},
-      {:phoenix_live_view, "~> 0.16.4 or ~> 0.17"}
+      {:phoenix, ">= 1.6.0"},
+      {:phoenix_live_view, ">= 0.16.4"}
     ]
   end
 
