@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Drop support for Elixir 1.15. Test against Elixir 1.18.
+
 ## 2.3.0
 
 - Relax version of `Phoenix.LiveView` to allow usage with `1.0.0`.

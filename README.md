@@ -13,6 +13,7 @@ tests.
 
 Pages has been used for testing multiple applications over the past 2+ years without much need for API changes.
 
+This library is tested against the latest 3 major versions of Elixir.
 
 ## Quick Overview
 
