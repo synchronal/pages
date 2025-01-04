@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.0.1
+
 - Require Elixir 1.16 or greater.
 
 ## 3.0.0
