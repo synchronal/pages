@@ -505,15 +505,33 @@ defmodule Test.Driver.LiveViewTest do
     end
   end
 
-  describe "preserves context on the driver" do
-    test "when following a redirect", %{conn: conn} do
+  describe "context" do
+    test "can store information for later retrieval", %{conn: conn} do
+      conn
+      |> Pages.visit("/live/form")
+      |> Pages.put_context(:foo, "bar")
+      |> Pages.get_context(:foo)
+      |> assert_eq("bar")
+    end
+
+    test "can put multiple values at once", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/live/form")
+        |> Pages.put_context(foo: "bar", baz: "fez")
+
+      assert Pages.get_context(page, :foo) == "bar"
+      assert Pages.get_context(page, :baz) == "fez"
+    end
+
+    test "preserves context on the driver when following a redirect", %{conn: conn} do
       page =
         conn
         |> Pages.visit("/live/form", hawak: "cool")
         |> Pages.update_form("#form", foo: [action: "redirect"])
         |> assert_here("pages/show")
 
-      assert_eq(page.context, %{hawak: "cool"})
+      assert Pages.get_context(page, :hawak) == "cool"
     end
   end
 end

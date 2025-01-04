@@ -340,4 +340,25 @@ defmodule Pages.Driver.ConnTest do
       assert form_params == %{radio_value: "updated", bool_value: false, select_value: ""}
     end
   end
+
+  describe "context" do
+    test "can store information for later retrieval", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.put_context(:foo, "bar")
+      |> Pages.get_context(:foo)
+      |> assert_eq("bar")
+    end
+
+    test "preserves context on the driver when following a redirect", %{conn: conn} do
+      page =
+        conn
+        |> Pages.visit("/pages/form")
+        |> Pages.put_context(:hawak, "cool")
+        |> Pages.submit_form("#form", :form, string_value: "updated")
+        |> assert_here("pages/show")
+
+      assert Pages.get_context(page, :hawak) == "cool"
+    end
+  end
 end

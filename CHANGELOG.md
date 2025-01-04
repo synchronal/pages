@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add `Pages.get_context` and `Pages.put_context` functions.
+
 ## 3.0.1
 
 - Require Elixir 1.16 or greater.

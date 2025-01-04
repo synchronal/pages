@@ -299,4 +299,23 @@ defmodule Pages do
   """
   @spec with_child_component(Pages.Driver.t(), child_id :: binary(), (Pages.Driver.t() -> term())) :: Pages.Driver.t()
   def with_child_component(%module{} = page, child_id, fun), do: module.with_child_component(page, child_id, fun)
+
+  # # #
+
+  @doc """
+  Returns `value` from `page`'s context. The context is a map that can be used to store test-specific information.
+  See also `put_context/3`.
+  """
+  @spec get_context(Pages.Driver.t(), atom()) :: any()
+  def get_context(page, key), do: Map.get(page.context, key)
+
+  @doc """
+  Puts `value` in `page`'s context and returns the page (not the context). The context is a map that can be used to
+  store test-specific information. See also `get_context/2`.
+  """
+  @spec put_context(Pages.Driver.t(), atom(), any()) :: Pages.Driver.t()
+  def put_context(page, key, value), do: %{page | context: Map.put(page.context, key, value)}
+
+  @spec put_context(Pages.Driver.t(), keyword() | %{atom() => any()}) :: Pages.Driver.t()
+  def put_context(page, key_value_pairs), do: %{page | context: Map.merge(page.context, Map.new(key_value_pairs))}
 end
