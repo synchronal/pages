@@ -143,7 +143,7 @@ assert page.context == %{some_key: "some_value"}
 ```elixir
 def deps do
   [
-    {:pages, "~> 3.0", only: :test}
+    {:pages, "~> 3.1", only: :test}
   ]
 end
 ```

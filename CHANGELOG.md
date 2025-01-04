@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.1.0
+
 - Add `Pages.get_context` and `Pages.put_context` functions.
 
 ## 3.0.1
