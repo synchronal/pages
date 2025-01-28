@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Introduce shim for `Phoenix.LiveViewTest` `:__live__` to allow use with LiveView 1.0.3.
+
 ## 3.1.0
 
 - Add `Pages.get_context` and `Pages.put_context` functions.

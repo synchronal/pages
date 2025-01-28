@@ -235,7 +235,7 @@ defmodule Pages.Driver.LiveView do
         |> then(fn
           %{assigns: %{live_module: _}} = new_conn ->
             new_conn
-            |> Phoenix.LiveViewTest.__live__(path)
+            |> Pages.Shim.__live(path)
 
           conn ->
             conn
@@ -245,7 +245,7 @@ defmodule Pages.Driver.LiveView do
         conn
         |> Phoenix.ConnTest.ensure_recycled()
         |> then(&Pages.Shim.__retain_connect_params(&1, conn))
-        |> Phoenix.LiveViewTest.__live__()
+        |> Pages.Shim.__live()
 
       true ->
         raise RuntimeError, "path must be nil or a binary, got: #{inspect(path)}"

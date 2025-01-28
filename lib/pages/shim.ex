@@ -23,6 +23,7 @@ defmodule Pages.Shim do
   end
 
   def __follow_trigger_action(form, conn) do
+    Code.ensure_loaded!(Phoenix.LiveViewTest)
     test_module = Phoenix.LiveViewTest
     old_function = :__render_trigger_event__
     new_function = :__render_trigger_submit__
@@ -50,6 +51,22 @@ defmodule Pages.Shim do
       true ->
         raise Pages.Error, "This version of #{test_module} does not define #{old_function} or #{new_function}"
     end
+  end
+
+  def __live(conn) do
+    Code.ensure_loaded!(Phoenix.LiveViewTest)
+
+    if function_exported?(Phoenix.LiveViewTest, :__live__, 1),
+      do: apply(Phoenix.LiveViewTest, :__live__, [conn]),
+      else: apply(Phoenix.LiveViewTest, :__live__, [conn, nil, []])
+  end
+
+  def __live(conn, path) do
+    Code.ensure_loaded!(Phoenix.LiveViewTest)
+
+    if function_exported?(Phoenix.LiveViewTest, :__live__, 2),
+      do: apply(Phoenix.LiveViewTest, :__live__, [conn, path]),
+      else: apply(Phoenix.LiveViewTest, :__live__, [conn, path, []])
   end
 
   def __retain_connect_params(conn, original_conn) do
