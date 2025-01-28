@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.2.0
+
 - Introduce shim for `Phoenix.LiveViewTest` `:__live__` to allow use with LiveView 1.0.3.
 
 ## 3.1.0
