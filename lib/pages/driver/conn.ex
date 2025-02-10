@@ -3,6 +3,24 @@ defmodule Pages.Driver.Conn do
 
   @moduledoc """
   A page driver for interacting with Phoenix controllers.
+
+  ## Inspect
+
+  When inspecting or debugging a page, the default implementation is concise.
+  The output can be configure via [`:custom_options`](https://hexdocs.pm/elixir/Inspect.Opts.html)
+  on the `Inspect` protocol.
+
+  Options:
+  - `custom_options: [html: true]` - when `true`, print the prettified rendered HTML
+    from the page.
+
+  ``` elixir
+  iex> conn |> Pages.visit("/") |> dbg()
+  # Pages.Driver.Conn.visit(page, "/")
+
+  iex> conn |> Pages.visit("/") |> dbg(custom_options: [html: true])
+  # <html> ... etc
+  ```
   """
 
   @behaviour Pages.Driver
@@ -160,8 +178,12 @@ defmodule Pages.Driver.Conn do
   defimpl Inspect do
     import Inspect.Algebra
 
-    def inspect(driver, _opts) do
-      concat(["Pages.Driver.Conn.visit(page, \"", driver.conn.request_path, "\")"])
+    def inspect(driver, opts) do
+      if Keyword.get(opts.custom_options, :html, false) do
+        concat([HtmlQuery.pretty(driver)])
+      else
+        concat(["Pages.Driver.Conn.visit(page, \"", driver.conn.request_path, "\")"])
+      end
     end
   end
 
