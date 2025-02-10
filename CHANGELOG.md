@@ -2,7 +2,10 @@
 
 ## Unreleased changes
 
-- Implement `Inspect` for conn and live view drivers.
+## 3.3.0
+
+- Implement `Inspect` for conn and live view drivers, with concise output. Inspect prints the prettified HTML from the
+  driver with `inspect(page, custom_options: [html: true])`.
 
 ## 3.2.0
 
