@@ -157,6 +157,14 @@ defmodule Pages.Driver.Conn do
       do: Phoenix.ConnTest.html_response(conn, 200)
   end
 
+  defimpl Inspect do
+    import Inspect.Algebra
+
+    def inspect(driver, _opts) do
+      concat(["Pages.Driver.Conn.visit(page, \"", driver.conn.request_path, "\")"])
+    end
+  end
+
   # # #
 
   defp error!(page, msg),

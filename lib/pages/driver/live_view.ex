@@ -301,4 +301,12 @@ defmodule Pages.Driver.LiveView do
     def to_string(%Pages.Driver.LiveView{live: live}) when not is_nil(live),
       do: live |> Phoenix.LiveViewTest.render()
   end
+
+  defimpl Inspect do
+    import Inspect.Algebra
+
+    def inspect(driver, _opts) do
+      concat(["Pages.Driver.LiveView.visit(page, \"", driver.conn.request_path, "\")"])
+    end
+  end
 end

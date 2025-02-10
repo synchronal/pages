@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Implement `Inspect` for conn and live view drivers.
+
 ## 3.2.0
 
 - Introduce shim for `Phoenix.LiveViewTest` `:__live__` to allow use with LiveView 1.0.3.
