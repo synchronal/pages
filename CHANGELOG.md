@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.4.0
+
 - Render a conn driver's response body from `to_string()` for all status codes, not just 200.
 
 ## 3.3.0
