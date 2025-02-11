@@ -171,8 +171,8 @@ defmodule Pages.Driver.Conn do
   # # #
 
   defimpl String.Chars do
-    def to_string(%Pages.Driver.Conn{conn: %Plug.Conn{status: 200} = conn}),
-      do: Phoenix.ConnTest.html_response(conn, 200)
+    def to_string(%Pages.Driver.Conn{conn: %Plug.Conn{status: status} = conn}),
+      do: Phoenix.ConnTest.html_response(conn, status)
   end
 
   defimpl Inspect do

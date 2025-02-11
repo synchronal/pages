@@ -2,6 +2,18 @@ defmodule Pages.Driver.ConnTest do
   use Test.ConnCase, async: true
   alias HtmlQuery, as: Hq
 
+  describe "to_string" do
+    test "renders the html from a status 200", %{conn: conn} do
+      page = conn |> Pages.visit("/pages/show")
+      assert page |> to_string() == page.conn.resp_body
+    end
+
+    test "renders the html from a status 404", %{conn: conn} do
+      page = conn |> Pages.visit("/pages/not_found")
+      assert page |> to_string() == page.conn.resp_body
+    end
+  end
+
   describe "visit" do
     test "gets from a controller", %{conn: conn} do
       conn
