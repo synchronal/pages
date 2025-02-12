@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add example to `Pages.render_upload/4` docs.
+
 ## 3.4.0
 
 - Render a conn driver's response body from `to_string()` for all status codes, not just 200.

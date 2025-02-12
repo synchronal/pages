@@ -83,9 +83,19 @@ defmodule Pages do
 
   @doc """
   Performs an upload of a file input and renders the result. See `Phoenix.LiveViewTest.file_input/4` for
-  a description of the `upload` field.
+  more detailed documentation of the `upload` argument.
+
+  ## Example
+
+  ``` elixir
+  entry = %{name: "file.jpg", content: File.read!("../path/to/file.jpg"), type: "image/jpeg"}
+  upload = Phoenix.LiveViewTest.file_input(page.live, "#selector", :entry_name, [entry])
+
+  page |> Pages.render_upload(upload, "file.jpg")
+  ```
   """
-  @spec render_upload(Pages.Driver.t(), live_view_upload(), binary(), integer()) :: Pages.result()
+  @spec render_upload(Pages.Driver.t(), live_view_upload(), entry_name :: binary(), percent_complete :: integer()) ::
+          Pages.result()
   def render_upload(%module{} = page, upload, entry_name, percent \\ 100),
     do: module.render_upload(page, upload, entry_name, percent)
 
