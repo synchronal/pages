@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.4.2
+
 - Add sponsorship link.
 
 ## 3.4.1
