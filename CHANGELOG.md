@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Add sponsorship link.
+
 ## 3.4.1
 
 - Add example to `Pages.render_upload/4` docs.
