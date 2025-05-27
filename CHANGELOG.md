@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+## 3.5.0
+
 - Update dependencies.
 
 ## 3.4.2
