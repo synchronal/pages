@@ -49,7 +49,7 @@ defmodule Pages.MixProject do
       {:markdown_formatter, "~> 1.0", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
       {:mix_test_interactive, "~> 4.0", only: :dev, runtime: false},
-      {:moar, "~> 2.0"},
+      {:moar, "> 2.0.0"},
       {:phoenix_ecto, "~> 4.4", only: :test, runtime: false},
       {:phoenix, ">= 1.6.0"},
       {:phoenix_live_view, ">= 0.16.4"}

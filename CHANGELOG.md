@@ -2,6 +2,8 @@
 
 ## Unreleased changes
 
+- Update dependencies.
+
 ## 3.4.2
 
 - Add sponsorship link.
