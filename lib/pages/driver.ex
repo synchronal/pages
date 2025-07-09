@@ -17,7 +17,7 @@ defmodule Pages.Driver do
               Pages.result() | no_return()
 
   @doc "Wait for a server-issued redirect. Implementation for `Pages.handle_redirect/1`."
-  @callback handle_redirect(Pages.Driver.t()) :: Pages.result()
+  @callback handle_redirect(Pages.Driver.t(), keyword()) :: Pages.result()
 
   @doc "Attempt to open the current page in a web browser."
   @callback open_browser(Pages.Driver.t()) :: Pages.Driver.t()
@@ -93,7 +93,7 @@ defmodule Pages.Driver do
 
   @optional_callbacks [
     click: 4,
-    handle_redirect: 1,
+    handle_redirect: 2,
     render_change: 3,
     render_upload: 4,
     render_hook: 4,

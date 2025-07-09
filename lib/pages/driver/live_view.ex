@@ -67,11 +67,12 @@ defmodule Pages.Driver.LiveView do
   def click(%__MODULE__{} = page, :post, maybe_title, selector),
     do: Pages.Driver.Conn.click(page, :post, maybe_title, selector)
 
-  @doc "Called from `Pages.handle_redirect/1` when the given page is a LiveView."
-  @spec handle_redirect(Pages.Driver.t()) :: Pages.Driver.t()
+  @doc "Called from `Pages.handle_redirect/2` when the given page is a LiveView."
+  @spec handle_redirect(Pages.Driver.t(), keyword()) :: Pages.Driver.t()
   @impl Pages.Driver
-  def handle_redirect(page) do
-    {path, _flash} = page.live |> Phoenix.LiveViewTest.assert_redirect()
+  def handle_redirect(page, options) do
+    timeout = Keyword.get(options, :timeout, Application.fetch_env!(:ex_unit, :assert_receive_timeout))
+    {path, _flash} = page.live |> Phoenix.LiveViewTest.assert_redirect(timeout)
 
     page.conn
     |> Phoenix.ConnTest.ensure_recycled()
