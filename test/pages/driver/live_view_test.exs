@@ -315,7 +315,7 @@ defmodule Test.Driver.LiveViewTest do
       |> assert_here("live/redirect")
       |> Pages.click(test_role: "trigger-async-redirect")
       |> assert_here("live/redirect")
-      |> Pages.handle_redirect()
+      |> Pages.handle_redirect(timeout: 100)
       |> assert_here("pages/show")
     end
   end

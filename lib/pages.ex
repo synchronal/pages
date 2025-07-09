@@ -65,8 +65,8 @@ defmodule Pages do
   Handles cases where the server issues a redirect to the client without a synchronous interaction from the
   user. This may be used to handle redirects issued from `c:Phoenix.LiveView.handle_info/2` callbacks, for instance.
   """
-  @spec handle_redirect(Pages.Driver.t()) :: Pages.result()
-  def handle_redirect(%module{} = page), do: module.handle_redirect(page)
+  @spec handle_redirect(Pages.Driver.t(), keyword()) :: Pages.result()
+  def handle_redirect(%module{} = page, options \\ []), do: module.handle_redirect(page, options)
 
   @doc """
   Attempt to open the current page in a web browser.
