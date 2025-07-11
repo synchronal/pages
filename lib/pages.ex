@@ -64,6 +64,19 @@ defmodule Pages do
   @doc """
   Handles cases where the server issues a redirect to the client without a synchronous interaction from the
   user. This may be used to handle redirects issued from `c:Phoenix.LiveView.handle_info/2` callbacks, for instance.
+
+  ## Arguments
+
+  | name | description |
+  | ---  | ---         |
+  | page | The current page struct. |
+  | opts | An optional keyword list of options. |
+
+  ## Options
+
+  | name    | description |
+  | ---     | ---         |
+  | timeout | Defaults to the config value for `:ex_unit, :assert_receive_timeout` |
   """
   @spec handle_redirect(Pages.Driver.t(), keyword()) :: Pages.result()
   def handle_redirect(%module{} = page, options \\ []), do: module.handle_redirect(page, options)
