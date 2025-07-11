@@ -2,6 +2,14 @@
 
 ## Unreleased changes
 
+## 4.0.0
+
+- Allow `handle_redirect` to take a custom timeout. Thanks @DuldR!
+
+**Breaking changes**:
+
+`c:Pages.Driver.handle_redirect/2` now receives a keyword list of options, replacing the callback with arity-1.
+
 ## 3.5.0
 
 - Update dependencies.
