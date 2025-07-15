@@ -56,8 +56,21 @@ defmodule Pages.Driver.ConnTest do
                "string_value" => "initial",
                "select_value" => "initial",
                "bool_value" => false,
-               "radio_value" => "initial"
+               "radio_value" => "initial",
+               "date_value" => "2021-01-01"
              }
+    end
+
+    test "submit form handles dates", %{conn: conn} do
+      conn
+      |> Pages.visit("/pages/form")
+      |> Pages.update_form("#form", :form, date_value: "2021-08-15")
+      |> Pages.submit_form("#form")
+      |> assert_here("pages/show")
+
+      assert_receive {:page_controller, :submit, :ok, params}
+
+      assert params["form"]["date_value"] == "2021-08-15"
     end
 
     test "handles non-redirect error renders", %{conn: conn} do
@@ -168,7 +181,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", :form, select_value: "updated")
@@ -196,7 +210,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", :form, bool_value: true)
@@ -224,7 +239,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", :form, radio_value: "updated")
@@ -283,7 +299,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", form: [select_value: "updated"])
@@ -311,7 +328,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", form: [bool_value: true])
@@ -339,7 +357,8 @@ defmodule Pages.Driver.ConnTest do
                select_value: "initial",
                string_value: "initial",
                bool_value: false,
-               radio_value: "initial"
+               radio_value: "initial",
+               date_value: "2021-01-01"
              }
 
       page = page |> Pages.update_form("#form", form: [radio_value: "updated"])

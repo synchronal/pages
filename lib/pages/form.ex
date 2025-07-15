@@ -152,7 +152,7 @@ defmodule Pages.Form do
     end
   end
 
-  @text_input_types ~w[email number password search tel text textarea url]
+  @text_input_types ~w[date email number password search tel text textarea url]
   defp update_value(attrs, type, inputs) when type in @text_input_types do
     {"name", name} = List.keyfind(attrs, "name", 0) || {"name", nil}
     value = Map.get(inputs, name)

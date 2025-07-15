@@ -23,6 +23,7 @@ defmodule Test.Site.PageView do
       <.form id="form" for={@form} action="/pages/form">
         <.input type="text" field={@form[:string_value]} label="String Value" />
         <.input type="select" field={@form[:select_value]} label="Select Value" options={select_value_options()} />
+        <.input type="date" field={@form[:date_value]} value="2021-01-01" label="Initial" />
         <.input type="checkbox" field={@form[:bool_value]} label="Check Value" />
         <.input
           type="radio"
