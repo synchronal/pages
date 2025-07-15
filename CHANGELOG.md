@@ -2,6 +2,10 @@
 
 ## Unreleased changes
 
+## 4.1.0
+
+- Handle date inputs in `submit_form` and `update_form`.
+
 ## 4.0.0
 
 - Allow `handle_redirect` to take a custom timeout. Thanks @DuldR!
