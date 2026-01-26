@@ -46,12 +46,13 @@ defmodule Pages.MixProject do
       {:gestalt, ">= 1.0.0 and < 3.0.0"},
       {:html_query, "> 2.0.0"},
       {:jason, "~> 1.3", optional: true},
+      {:lazy_html, ">= 0.1.0", only: :test},
       {:markdown_formatter, "~> 1.0", only: :dev, runtime: false},
       {:mix_audit, "~> 2.0", only: :dev, runtime: false},
-      {:mix_test_interactive, "~> 4.0", only: :dev, runtime: false},
+      {:mix_test_interactive, "~> 5.0", only: :dev, runtime: false},
       {:moar, "> 2.0.0"},
-      {:phoenix_ecto, "~> 4.4", only: :test, runtime: false},
       {:phoenix, ">= 1.6.0"},
+      {:phoenix_ecto, "~> 4.4", only: :test, runtime: false},
       {:phoenix_live_view, ">= 0.16.4"}
     ]
   end

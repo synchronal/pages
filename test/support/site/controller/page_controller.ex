@@ -1,5 +1,5 @@
 defmodule Test.Site.PageController do
-  use Phoenix.Controller, layouts: [html: {Test.Site.Layout, :basic}]
+  use Phoenix.Controller, layouts: [html: {Test.Site.Layout, :basic}], formats: [:html]
   use Phoenix.VerifiedRoutes, endpoint: Test.Site.Endpoint, router: Test.Site.Router
   import Phoenix.Component, only: [to_form: 2]
 

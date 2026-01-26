@@ -1,4 +1,4 @@
-defmodule Test.Site.PageView do
+defmodule Test.Site.PageHTML do
   use Phoenix.Component
 
   def render("root.html", assigns) do
