@@ -25,10 +25,6 @@ elif command -v mise; then
   TOOLS="mise"
 fi
 
-check "tool-versions: erlang plugin installed" \
-  "${TOOLS} plugin-list | grep erlang" \
-  "${TOOLS} plugin add erlang"
-
 check "tool-versions: elixir plugin installed" \
   "${TOOLS} plugin-list | grep elixir" \
   "${TOOLS} plugin add elixir"
