@@ -3,7 +3,6 @@ defmodule Test.Helpers do
   import Moar.Assertions
 
   alias HtmlQuery, as: Hq
-  require ExUnit.Callbacks
 
   def assert_driver(%Pages.Driver.Conn{} = page, :conn), do: page
   def assert_driver(%Pages.Driver.LiveView{} = page, :live_view), do: page
